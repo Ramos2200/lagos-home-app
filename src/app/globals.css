@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+/*
+ * IleLagos design tokens.
+ * Warm off-white canvas, white surfaces, deep green-teal accent, dark ink text.
+ * Colour names (sand / ink / brand) are kept so existing classes keep working.
+ */
+@theme {
+  /* Neutrals — warm off-white canvas and borders */
+  --color-sand-50: #fbf9f5;
+  --color-sand-100: #f6f2eb; /* page canvas */
+  --color-sand-200: #ebe4d8; /* subtle border */
+  --color-sand-300: #d9cfbf; /* input / strong border */
+  --color-sand-500: #a1957f;
+
+  /* Ink — text */
+  --color-ink-900: #16201c; /* headings, body */
+  --color-ink-700: #37423d; /* secondary text */
+  --color-ink-500: #5e6964; /* muted text (≥4.5:1 on white) */
+  --color-ink-300: #a9b1ad;
+
+  /* Brand — deep green-teal */
+  --color-brand-50: #ebf5f1;
+  --color-brand-100: #d2e9df;
+  --color-brand-200: #a7d2c1;
+  --color-brand-500: #187a63;
+  --color-brand-600: #10644f;
+  --color-brand-700: #0c5141;
+  --color-brand-800: #0a4035;
+  --color-brand-900: #072f27;
+
+  /* Shadows — restrained */
+  --shadow-card: 0 1px 2px rgb(22 32 28 / 0.04), 0 1px 1px rgb(22 32 28 / 0.02);
+  --shadow-raised: 0 10px 30px -12px rgb(22 32 28 / 0.22), 0 2px 6px -2px rgb(22 32 28 / 0.08);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--color-sand-100);
+    color: var(--color-ink-900);
+    font-size: 15px;
+    line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-brand-100);
+  }
+}
+
+/* ── Typography ─────────────────────────────────────────── */
+@utility page-title {
+  @apply text-[26px] leading-tight font-semibold tracking-tight text-ink-900 sm:text-[32px];
+}
+@utility section-title {
+  @apply text-[17px] leading-snug font-semibold tracking-tight text-ink-900;
+}
+@utility eyebrow {
+  @apply text-xs font-semibold tracking-[0.08em] text-brand-700 uppercase;
+}
+@utility muted {
+  @apply text-sm text-ink-500;
+}
+
+/* ── Surfaces ───────────────────────────────────────────── */
+@utility card {
+  @apply rounded-2xl border border-sand-200 bg-white shadow-card;
+}
+/* Soft inset area inside a card or section (facts, notes). */
+@utility well {
+  @apply rounded-xl bg-sand-50 ring-1 ring-sand-200;
+}
+
+/* ── Forms ──────────────────────────────────────────────── */
+@utility field {
+  @apply min-h-11 w-full rounded-xl border border-sand-300 bg-white px-3 py-2.5 text-[15px] text-ink-900 transition placeholder:text-ink-500/70 hover:border-ink-300 focus:border-brand-500 focus:ring-3 focus:ring-brand-100 focus:outline-none disabled:bg-sand-50;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-ink-700;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold whitespace-nowrap transition select-none disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white shadow-card hover:bg-brand-700 active:bg-brand-800;
+}
+@utility btn-secondary {
+  @apply btn border border-sand-300 bg-white text-ink-900 hover:border-ink-300 hover:bg-sand-50;
+}
+@utility btn-ghost {
+  @apply btn text-ink-700 hover:bg-sand-200/70 hover:text-ink-900;
+}
+@utility btn-danger {
+  @apply btn bg-red-700 text-white hover:bg-red-800;
+}
+/* Size modifier: combine with a variant, e.g. "btn-secondary btn-sm". */
+@utility btn-sm {
+  @apply min-h-9! rounded-lg! px-3! text-sm!;
+}
+@utility btn-icon {
+  @apply min-h-11! min-w-11! px-0!;
+}
+@utility link {
+  @apply font-semibold text-brand-700 underline-offset-2 hover:underline;
+}
+
+/* ── Chips (filters, toggles) ───────────────────────────── */
+@utility chip {
+  @apply inline-flex min-h-9 items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 text-sm font-medium text-ink-700 transition hover:border-ink-300;
+}
+@utility chip-on {
+  @apply border-brand-600! bg-brand-50! text-brand-800!;
+}
+
+/* Square option tiles (bedroom counts, rent/sale choice in forms) */
+@utility tile {
+  @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-sand-300 bg-white px-2 text-sm font-semibold text-ink-700 transition hover:border-ink-300;
+}
+@utility tile-on {
+  @apply border-brand-600! bg-brand-50! text-brand-800!;
+}
+
+/* ── Segmented control (Rent / Buy) ─────────────────────── */
+@utility segmented {
+  @apply inline-flex rounded-xl bg-sand-200/70 p-1;
+}
+@utility segment {
+  @apply min-h-9 rounded-lg px-4 text-sm font-semibold text-ink-500 transition hover:text-ink-900;
+}
+@utility segment-on {
+  @apply bg-white! text-ink-900! shadow-card;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+@utility tab {
+  @apply -mb-px shrink-0 border-b-2 border-transparent px-1 py-3 text-sm font-semibold text-ink-500 transition hover:text-ink-900;
+}
+@utility tab-on {
+  @apply border-brand-600! text-ink-900!;
+}
+
+/* Native selects: consistent chevron */
+select.field {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235e6964' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
