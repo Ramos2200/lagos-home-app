@@ -2,36 +2,38 @@
 
 /*
  * IleLagos design tokens.
- * Warm off-white canvas, white surfaces, deep green-teal accent, dark ink text.
+ * Crisp white canvas, cool neutral greys, one vivid green accent, near-black text.
+ * (Layout ideas inspired by large property portals; colours and brand are our own.)
  * Colour names (sand / ink / brand) are kept so existing classes keep working.
  */
 @theme {
-  /* Neutrals — warm off-white canvas and borders */
-  --color-sand-50: #fbf9f5;
-  --color-sand-100: #f6f2eb; /* page canvas */
-  --color-sand-200: #ebe4d8; /* subtle border */
-  --color-sand-300: #d9cfbf; /* input / strong border */
-  --color-sand-500: #a1957f;
+  /* Neutrals — cool greys (names kept so existing classes keep working) */
+  --color-sand-50: #f8f9fa;
+  --color-sand-100: #f2f3f5; /* soft fill */
+  --color-sand-200: #e4e6ea; /* hairline border */
+  --color-sand-300: #cfd3d9; /* input border */
+  --color-sand-500: #9aa0a9;
 
   /* Ink — text */
-  --color-ink-900: #16201c; /* headings, body */
-  --color-ink-700: #37423d; /* secondary text */
-  --color-ink-500: #5e6964; /* muted text (≥4.5:1 on white) */
-  --color-ink-300: #a9b1ad;
+  --color-ink-900: #111318; /* headings, body */
+  --color-ink-700: #393e47; /* secondary text */
+  --color-ink-500: #5c626d; /* muted text (≥4.5:1 on white) */
+  --color-ink-300: #a7adb6;
 
-  /* Brand — deep green-teal */
-  --color-brand-50: #ebf5f1;
-  --color-brand-100: #d2e9df;
-  --color-brand-200: #a7d2c1;
-  --color-brand-500: #187a63;
-  --color-brand-600: #10644f;
-  --color-brand-700: #0c5141;
-  --color-brand-800: #0a4035;
-  --color-brand-900: #072f27;
+  /* Brand — vivid IleLagos green */
+  --color-brand-50: #e9f7f1;
+  --color-brand-100: #c9ecdc;
+  --color-brand-200: #97d8bd;
+  --color-brand-500: #0f8a65;
+  --color-brand-600: #0a7656;
+  --color-brand-700: #075f45;
+  --color-brand-800: #064b37;
+  --color-brand-900: #043629;
 
   /* Shadows — restrained */
-  --shadow-card: 0 1px 2px rgb(22 32 28 / 0.04), 0 1px 1px rgb(22 32 28 / 0.02);
-  --shadow-raised: 0 10px 30px -12px rgb(22 32 28 / 0.22), 0 2px 6px -2px rgb(22 32 28 / 0.08);
+  --shadow-card: 0 1px 2px rgb(17 19 24 / 0.06);
+  --shadow-raised: 0 8px 24px -6px rgb(17 19 24 / 0.18), 0 2px 6px -2px rgb(17 19 24 / 0.08);
+  --shadow-float: 0 18px 50px -12px rgb(17 19 24 / 0.35);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
@@ -41,7 +43,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    background: var(--color-sand-100);
+    background: #ffffff;
     color: var(--color-ink-900);
     font-size: 15px;
     line-height: 1.55;
@@ -58,10 +60,10 @@
 
 /* ── Typography ─────────────────────────────────────────── */
 @utility page-title {
-  @apply text-[26px] leading-tight font-semibold tracking-tight text-ink-900 sm:text-[32px];
+  @apply text-[26px] leading-tight font-bold tracking-tight text-ink-900 sm:text-[32px];
 }
 @utility section-title {
-  @apply text-[17px] leading-snug font-semibold tracking-tight text-ink-900;
+  @apply text-[18px] leading-snug font-bold tracking-tight text-ink-900;
 }
 @utility eyebrow {
   @apply text-xs font-semibold tracking-[0.08em] text-brand-700 uppercase;
@@ -72,7 +74,7 @@
 
 /* ── Surfaces ───────────────────────────────────────────── */
 @utility card {
-  @apply rounded-2xl border border-sand-200 bg-white shadow-card;
+  @apply rounded-xl border border-sand-200 bg-white;
 }
 /* Soft inset area inside a card or section (facts, notes). */
 @utility well {
@@ -81,7 +83,7 @@
 
 /* ── Forms ──────────────────────────────────────────────── */
 @utility field {
-  @apply min-h-11 w-full rounded-xl border border-sand-300 bg-white px-3 py-2.5 text-[15px] text-ink-900 transition placeholder:text-ink-500/70 hover:border-ink-300 focus:border-brand-500 focus:ring-3 focus:ring-brand-100 focus:outline-none disabled:bg-sand-50;
+  @apply min-h-11 w-full rounded-lg border border-sand-300 bg-white px-3 py-2.5 text-[15px] text-ink-900 transition placeholder:text-ink-500/70 hover:border-ink-300 focus:border-brand-500 focus:ring-3 focus:ring-brand-100 focus:outline-none disabled:bg-sand-50;
 }
 @utility label {
   @apply mb-1.5 block text-sm font-medium text-ink-700;
@@ -89,16 +91,16 @@
 
 /* ── Buttons ────────────────────────────────────────────── */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-[15px] font-semibold whitespace-nowrap transition select-none disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-[15px] font-bold whitespace-nowrap transition select-none disabled:cursor-not-allowed disabled:opacity-50;
 }
 @utility btn-primary {
-  @apply btn bg-brand-600 text-white shadow-card hover:bg-brand-700 active:bg-brand-800;
+  @apply btn bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800;
 }
 @utility btn-secondary {
-  @apply btn border border-sand-300 bg-white text-ink-900 hover:border-ink-300 hover:bg-sand-50;
+  @apply btn border border-brand-600 bg-white text-brand-700 hover:bg-brand-50;
 }
 @utility btn-ghost {
-  @apply btn text-ink-700 hover:bg-sand-200/70 hover:text-ink-900;
+  @apply btn font-semibold text-ink-700 hover:bg-sand-100 hover:text-ink-900;
 }
 @utility btn-danger {
   @apply btn bg-red-700 text-white hover:bg-red-800;
@@ -124,7 +126,7 @@
 
 /* Square option tiles (bedroom counts, rent/sale choice in forms) */
 @utility tile {
-  @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-sand-300 bg-white px-2 text-sm font-semibold text-ink-700 transition hover:border-ink-300;
+  @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-sand-300 bg-white px-2 text-sm font-semibold text-ink-700 transition hover:border-ink-300;
 }
 @utility tile-on {
   @apply border-brand-600! bg-brand-50! text-brand-800!;
@@ -132,10 +134,10 @@
 
 /* ── Segmented control (Rent / Buy) ─────────────────────── */
 @utility segmented {
-  @apply inline-flex rounded-xl bg-sand-200/70 p-1;
+  @apply inline-flex rounded-lg bg-sand-100 p-1;
 }
 @utility segment {
-  @apply min-h-9 rounded-lg px-4 text-sm font-semibold text-ink-500 transition hover:text-ink-900;
+  @apply min-h-9 rounded-md px-4 text-sm font-semibold text-ink-500 transition hover:text-ink-900;
 }
 @utility segment-on {
   @apply bg-white! text-ink-900! shadow-card;
@@ -156,4 +158,24 @@ select.field {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235e6964' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
+}
+
+/* ── Filter pill (search bar) ───────────────────────────── */
+@utility pill {
+  @apply inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-sand-300 bg-white px-3.5 text-sm font-semibold text-ink-900 transition hover:border-ink-500;
+}
+@utility pill-on {
+  @apply border-brand-600! bg-brand-50! text-brand-800!;
+}
+
+/* Gentle entrance for cards and panels (respects reduced-motion). */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@utility animate-rise {
+  animation: rise 0.35s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

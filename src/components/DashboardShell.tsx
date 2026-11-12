@@ -80,7 +80,7 @@ export function DashboardShell<T extends string>({
       {/* Phones and tablets: a simple scrollable tab row that stays in reach */}
       <nav
         aria-label="Dashboard sections"
-        className="sticky top-14 z-20 -mx-4 mt-6 border-b border-sand-200 bg-sand-100/95 px-4 backdrop-blur-md lg:hidden"
+        className="sticky top-16 z-20 -mx-4 mt-6 border-b border-sand-200 bg-white/95 px-4 backdrop-blur-md lg:hidden"
       >
         <ul className="flex gap-5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {sections.map((s) => {

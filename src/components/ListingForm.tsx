@@ -650,7 +650,7 @@ export function ListingForm({
           </>
         )}
 
-        <div className="sticky bottom-0 -mx-4 border-t border-sand-200 bg-sand-100/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0">
+        <div className="sticky bottom-0 -mx-4 border-t border-sand-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0">
           <div className="flex gap-2">
             {step > 0 ? (
               <button type="button" className="btn-secondary" onClick={() => goTo(step - 1)}>Back</button>

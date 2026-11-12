@@ -125,10 +125,27 @@ export function ListingDetailView() {
         <div className="min-w-0 space-y-6">
           {/* Title, location, key facts */}
           <header>
-            <p className="eyebrow">
+            <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
+              <p className="flex items-baseline gap-1.5">
+                <span className="text-[32px] leading-none font-extrabold tracking-tight text-ink-900 sm:text-[40px]">{naira(listing.price)}</span>
+                <span className="text-lg font-bold text-ink-700">{priceUnit(listing)}</span>
+              </p>
+              <p className="flex items-center gap-3 pb-1 text-[17px] text-ink-900">
+                <span><b className="font-extrabold">{listing.bedrooms}</b> bd</span>
+                <span className="h-4 w-px bg-sand-300" aria-hidden />
+                <span><b className="font-extrabold">{listing.bathrooms}</b> ba</span>
+                {listing.sizeSqm && (
+                  <>
+                    <span className="h-4 w-px bg-sand-300" aria-hidden />
+                    <span><b className="font-extrabold">{listing.sizeSqm}</b> m²</span>
+                  </>
+                )}
+              </p>
+            </div>
+            <h1 className="mt-3 text-[20px] leading-snug font-bold text-ink-900 sm:text-[22px]">{listing.title}</h1>
+            <p className="mt-0.5 text-sm font-semibold text-ink-500">
               {listing.purpose === "rent" ? "For rent" : "For sale"} · {PROPERTY_TYPE_LABEL[listing.propertyType]}
             </p>
-            <h1 className="page-title mt-1.5">{listing.title}</h1>
             <p className="mt-2 flex items-start gap-1.5 text-[15px] text-ink-700">
               <PinIcon className="mt-1 shrink-0 text-ink-500" />
               <span>
