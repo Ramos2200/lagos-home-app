@@ -1,6 +1,6 @@
 import { NEARBY, normalize, resolveAreas } from "./areas";
 import { STALE_AFTER_DAYS } from "./constants";
-import { FREQUENCY_SHORT, annualize, daysSince, localDateOf, relativeDays } from "./format";
+import { FREQUENCY_SHORT, annualize, daysSince, localDateOf, nairaCompact, relativeDays } from "./format";
 import type { Listing, ListingStatus, Purpose } from "./types";
 
 /**
@@ -30,7 +30,7 @@ export interface SearchFilters {
   amenities: string[];
   hideUnderOffer: boolean;
   confirmedOnly: boolean;
-  sort: "recommended" | "price_asc" | "price_desc" | "move_in_asc" | "newest";
+  sort: "recommended" | "price_asc" | "price_desc" | "move_in_asc" | "newest" | "size_desc" | "reduced";
 }
 
 export const DEFAULT_FILTERS: SearchFilters = {
@@ -63,7 +63,7 @@ export function filtersFromParams(p: URLSearchParams): SearchFilters {
     hideUnderOffer: p.get("hideOffer") === "1",
     confirmedOnly: p.get("confirmed") === "1",
     sort:
-      sort === "price_asc" || sort === "price_desc" || sort === "move_in_asc" || sort === "newest" ? sort : "recommended",
+      sort === "price_asc" || sort === "price_desc" || sort === "move_in_asc" || sort === "newest" || sort === "size_desc" || sort === "reduced" ? sort : "recommended",
   };
 }
 
@@ -132,6 +132,15 @@ export function searchListings(all: Listing[], f: SearchFilters): Listing[] {
         return moveInTotal(a).total - moveInTotal(b).total;
       case "newest":
         return b.createdAt.localeCompare(a.createdAt);
+      case "size_desc":
+        // Homes without a size go last; ties fall back to more bedrooms first.
+        return (b.sizeSqm ?? -1) - (a.sizeSqm ?? -1) || b.bedrooms - a.bedrooms;
+      case "reduced": {
+        // Most recent price cut first; homes without a cut follow in the recommended order.
+        const ca = priceCut(a)?.date ?? "";
+        const cb = priceCut(b)?.date ?? "";
+        return cb.localeCompare(ca) || rank(a) - rank(b) || b.lastConfirmed.localeCompare(a.lastConfirmed);
+      }
       default:
         return rank(a) - rank(b) || b.lastConfirmed.localeCompare(a.lastConfirmed);
     }
@@ -312,3 +321,45 @@ export function searchUpdates(all: Listing[], query: string, lastSeenAt?: string
     .filter((l) => changedAt(l) > lastSeenAt)
     .map((l) => ({ listing: l, kind: l.createdAt >= seenDay ? ("new" as const) : ("updated" as const) }));
 }
+
+/** A listing counts as "New" for this many days after it was first listed. */
+export const NEW_FOR_DAYS = 7;
+/** A price drop shows as "Price cut" for this many days. */
+export const PRICE_CUT_FOR_DAYS = 45;
+
+/** The latest asking-price drop, if the most recent change in the price history was a reduction. */
+export function priceCut(l: Listing): { amount: number; date: string } | null {
+  const pts = [...l.priceHistory].sort((a, b) => a.date.localeCompare(b.date));
+  if (pts.length < 2) return null;
+  const last = pts[pts.length - 1];
+  const prev = pts[pts.length - 2];
+  if (last.price >= prev.price) return null;
+  return { amount: prev.price - last.price, date: last.date };
+}
+
+export interface ListingBadge {
+  key: "new" | "price_cut";
+  label: string;
+  /** Longer text for screen readers and tooltips. */
+  title: string;
+}
+
+/** Short labels shown on cards and the listing page: "New" and "Price cut". */
+export function listingBadges(l: Listing): ListingBadge[] {
+  const out: ListingBadge[] = [];
+  const age = daysSince(l.createdAt);
+  if (age <= NEW_FOR_DAYS) out.push({ key: "new", label: "New", title: `Listed ${relativeDays(l.createdAt)}` });
+  const cut = priceCut(l);
+  if (cut && daysSince(cut.date) <= PRICE_CUT_FOR_DAYS) {
+    const per = l.purpose === "rent" && l.rentFrequency ? FREQUENCY_SHORT[l.rentFrequency] : "";
+    out.push({ key: "price_cut", label: `Price cut ${nairaCompact(cut.amount)}${per}`, title: `Asking price lowered ${relativeDays(cut.date)}` });
+  }
+  return out;
+}
+
+/** "today", "1 day ago", "23 days ago" — how long since the listing was first put up. */
+export function daysListedLabel(l: Listing): string {
+  const d = Math.max(daysSince(l.createdAt), 0);
+  return d === 0 ? "today" : `${d} day${d === 1 ? "" : "s"} ago`;
+}
+

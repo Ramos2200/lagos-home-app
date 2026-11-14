@@ -167,6 +167,7 @@ function CompareTable({ listings, onRemove }: { listings: Listing[]; onRemove: (
     { label: "Occupancy", cell: (l) => OCCUPANCY_LABEL[l.occupancy] },
     { label: "Water", cell: (l) => l.details.water || <span className="text-ink-500 italic">Not provided</span> },
     { label: "Power", cell: (l) => l.details.power || <span className="text-ink-500 italic">Not provided</span> },
+    { label: "Flooding", cell: (l) => l.details.flooding || <span className="text-ink-500 italic">Not provided</span> },
     {
       label: "Key amenities",
       cell: (l) => (

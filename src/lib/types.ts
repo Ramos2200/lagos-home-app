@@ -66,6 +66,10 @@ export interface ListingDetails {
   security: string;
   parking: string;
   roadAccess: string;
+  /** What the lister says about flooding on the street or estate. Missing = "Not provided". */
+  flooding?: string;
+  /** Schools, markets, hospitals or bus stops nearby, as described by the lister. */
+  nearby?: string;
 }
 
 export interface Listing {

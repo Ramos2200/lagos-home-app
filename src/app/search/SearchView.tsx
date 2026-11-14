@@ -269,6 +269,8 @@ export function SearchView() {
                   <option value="price_desc">Price (high to low)</option>
                   <option value="move_in_asc">{filters.mode === "rent" ? "Lowest first payment" : "Lowest total with fees"}</option>
                   <option value="newest">Newest</option>
+                  <option value="reduced">Recent price cuts</option>
+                  <option value="size_desc">Largest (m²)</option>
                 </select>
               </label>
               <div className="inline-flex rounded-lg bg-sand-100 p-0.5" role="group" aria-label="Result layout">

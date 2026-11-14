@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { PROPERTY_TYPE_LABEL } from "@/lib/constants";
 import { FREQUENCY_LABEL, annualize, naira, nairaCompact } from "@/lib/format";
-import { availabilityInfo, feeParts, moveInTotal, type AvailabilityInfo } from "@/lib/listing-utils";
+import { availabilityInfo, daysListedLabel, feeParts, listingBadges, moveInTotal, type AvailabilityInfo } from "@/lib/listing-utils";
 import { useStore } from "@/lib/store";
 import type { Listing } from "@/lib/types";
 import { HeartIcon } from "./Icons";
@@ -73,6 +73,28 @@ function AvailabilityPill({ listing }: { listing: Listing }) {
       <span className={`h-1.5 w-1.5 rounded-full ${DOT[a.tone]}`} aria-hidden />
       {a.label}
     </span>
+  );
+}
+
+/** "New" and "Price cut ₦500k/yr" labels. Renders nothing when neither applies. */
+export function ListingBadges({ listing, onPhoto = true }: { listing: Listing; onPhoto?: boolean }) {
+  const badges = listingBadges(listing);
+  if (!badges.length) return null;
+  return (
+    <>
+      {badges.map((b) => (
+        <span
+          key={b.key}
+          title={b.title}
+          className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold ${
+            b.key === "new" ? "bg-ink-900 text-white" : "bg-red-600 text-white"
+          } ${onPhoto ? "shadow-card" : ""}`}
+        >
+          {b.label}
+          <span className="sr-only">. {b.title}</span>
+        </span>
+      ))}
+    </>
   );
 }
 
@@ -168,7 +190,7 @@ function ListedBy({ listing }: { listing: Listing }) {
   const agent = listing.agentId ? data.users.find((u) => u.id === listing.agentId) : undefined;
   return (
     <p className="truncate text-[11px] font-semibold tracking-wide text-ink-500 uppercase">
-      {agent ? `Listed by ${agent.agencyName?.replace(/ \(fictional\)$/, "") ?? agent.name}` : "Listed by owner"} · demo
+      {agent ? `Listed by ${agent.agencyName?.replace(/ \(fictional\)$/, "") ?? agent.name}` : "Listed by owner"} · {daysListedLabel(listing)} · demo
     </p>
   );
 }
@@ -182,7 +204,10 @@ export function ListingCard({ listing, layout = "grid" }: { listing: Listing; la
     <p className="flex flex-wrap items-baseline gap-x-1.5">
       <span className={`${layout === "list" ? "text-[20px]" : "text-[24px]"} leading-none font-extrabold tracking-tight text-ink-900`}>{naira(listing.price)}</span>
       {unit && <span className="text-[15px] font-bold text-ink-700">{unit}</span>}
-      <span className="sr-only">{priceUnit(listing)}</span>
+      <span className="sr-only">
+        {priceUnit(listing)}
+        {listingBadges(listing).map((b) => `. ${b.label}`).join("")}
+      </span>
       {eq && <span className="text-xs text-ink-500">({eq})</span>}
     </p>
   );
@@ -192,7 +217,7 @@ export function ListingCard({ listing, layout = "grid" }: { listing: Listing; la
       <article className="group relative flex overflow-hidden rounded-xl border border-sand-200 bg-white transition hover:shadow-raised">
         <Link href={href} className="relative w-[40%] max-w-[220px] min-w-[124px] shrink-0 overflow-hidden" tabIndex={-1} aria-hidden>
           <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="h-full min-h-[168px] transition duration-500 group-hover:scale-[1.03]" showTag={false} />
-          <span className="absolute top-2 left-2"><AvailabilityPill listing={listing} /></span>
+          <span className="absolute top-2 left-2 flex max-w-[calc(100%-1rem)] flex-col items-start gap-1"><AvailabilityPill listing={listing} /><ListingBadges listing={listing} /></span>
           <span className="absolute bottom-1.5 left-1.5"><PhotoCount /></span>
         </Link>
         <Link href={href} className="min-w-0 flex-1 space-y-1.5 p-3 pr-11 focus-visible:rounded-r-xl focus-visible:outline-offset-[-3px] sm:p-4 sm:pr-12">
@@ -211,7 +236,7 @@ export function ListingCard({ listing, layout = "grid" }: { listing: Listing; la
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-sand-200 bg-white transition hover:shadow-raised">
       <Link href={href} className="relative block overflow-hidden" tabIndex={-1} aria-hidden>
         <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="aspect-[16/10] transition duration-500 group-hover:scale-[1.03]" showTag={false} />
-        <span className="absolute top-3 left-3"><AvailabilityPill listing={listing} /></span>
+        <span className="absolute top-3 left-3 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1.5"><AvailabilityPill listing={listing} /><ListingBadges listing={listing} /></span>
         <span className="absolute bottom-2 left-2"><PhotoCount /></span>
       </Link>
       <Link href={href} className="flex flex-1 flex-col gap-1.5 px-4 pt-3 pb-4 focus-visible:outline-offset-[-3px]">

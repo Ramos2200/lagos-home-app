@@ -35,6 +35,8 @@ export interface ListingFormValues {
   security: string;
   parking: string;
   roadAccess: string;
+  flooding: string;
+  nearby: string;
   status: ListingStatus;
   occupancy: Occupancy;
   availableFrom: string;
@@ -73,6 +75,8 @@ export function valuesFromListing(l?: Listing): ListingFormValues {
     security: l?.details.security ?? "",
     parking: l?.details.parking ?? "",
     roadAccess: l?.details.roadAccess ?? "",
+    flooding: l?.details.flooding ?? "",
+    nearby: l?.details.nearby ?? "",
     status: l?.status ?? "available",
     occupancy: l?.occupancy ?? "vacant",
     availableFrom: l?.availableFrom ?? todayISO(),
@@ -117,7 +121,7 @@ export function listingFieldsFromValues(v: ListingFormValues) {
     toilets: num(v.toilets) ?? 0,
     sizeSqm: num(v.sizeSqm),
     amenities: v.amenities,
-    details: { water: v.water.trim(), power: v.power.trim(), security: v.security.trim(), parking: v.parking.trim(), roadAccess: v.roadAccess.trim() },
+    details: { water: v.water.trim(), power: v.power.trim(), security: v.security.trim(), parking: v.parking.trim(), roadAccess: v.roadAccess.trim(), flooding: v.flooding.trim(), nearby: v.nearby.trim() },
     status: v.status,
     occupancy: v.occupancy,
     availableFrom: v.availableFrom,
@@ -531,14 +535,22 @@ export function ListingForm({
                 <p className="text-xs text-ink-500">This status hides the listing from search results.</p>
               )}
             </Section>
-            <Section title="Water, power, security & access">
+            <Section title="Neighbourhood: water, power, security, flooding & access">
               <div className="grid gap-3 sm:grid-cols-2">
                 <Field label="Water" id="water"><input id="water" className="field" value={v.water} onChange={(e) => set("water", e.target.value)} placeholder="e.g. Borehole with treatment" /></Field>
                 <Field label="Power" id="power"><input id="power" className="field" value={v.power} onChange={(e) => set("power", e.target.value)} placeholder="e.g. Grid + estate generator" /></Field>
                 <Field label="Security" id="security"><input id="security" className="field" value={v.security} onChange={(e) => set("security", e.target.value)} placeholder="e.g. Gated, 24-hr guards" /></Field>
                 <Field label="Parking" id="parking"><input id="parking" className="field" value={v.parking} onChange={(e) => set("parking", e.target.value)} placeholder="e.g. 2 cars" /></Field>
               </div>
-              <Field label="Road access" id="road"><input id="road" className="field" value={v.roadAccess} onChange={(e) => set("roadAccess", e.target.value)} placeholder="e.g. Tarred; floods in heavy rain" /></Field>
+              <Field label="Road access" id="road"><input id="road" className="field" value={v.roadAccess} onChange={(e) => set("roadAccess", e.target.value)} placeholder="e.g. Tarred close, 5 min to expressway" /></Field>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Flooding" id="flooding" hint="Be honest — renters and buyers will ask.">
+                  <input id="flooding" className="field" value={v.flooding} onChange={(e) => set("flooding", e.target.value)} placeholder="e.g. Street floods for a few hours in heavy rain" />
+                </Field>
+                <Field label="Nearby" id="nearby">
+                  <input id="nearby" className="field" value={v.nearby} onChange={(e) => set("nearby", e.target.value)} placeholder="e.g. Bus stop 3 min walk, schools, market" />
+                </Field>
+              </div>
               <div>
                 <span className="label">Amenities</span>
                 <div className="flex flex-wrap gap-2">

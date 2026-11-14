@@ -144,3 +144,30 @@ export function areasToQuery(areas: string[]): string {
   }
   return [...parts, ...rest].join(", ");
 }
+
+/** Destinations used in the rough travel guide on listing pages. */
+export const TRAVEL_DESTINATIONS = ["Victoria Island", "Ikeja", "Lekki Phase 1"] as const;
+
+/**
+ * Rough drive times in minutes, [quiet roads, rush hour], from each area to the destinations above.
+ * A hand-made guide for the prototype — NOT live traffic, and real Lagos journeys vary a lot.
+ * null means the home is already in or next to that destination.
+ */
+export const TRAVEL_GUIDE: Record<string, [[number, number] | null, [number, number] | null, [number, number] | null]> = {
+  "Lekki Phase 1": [[15, 45], [45, 120], null],
+  Ikate: [[20, 60], [50, 130], [10, 25]],
+  Chevron: [[25, 75], [55, 140], [15, 40]],
+  Ajah: [[35, 100], [65, 160], [25, 70]],
+  Sangotedo: [[45, 120], [75, 180], [35, 90]],
+  Ikoyi: [[10, 30], [40, 110], [15, 40]],
+  "Victoria Island": [null, [40, 110], [15, 45]],
+  Yaba: [[25, 75], [30, 80], [35, 90]],
+  Surulere: [[25, 75], [30, 80], [35, 95]],
+  Gbagada: [[30, 90], [20, 60], [40, 110]],
+  Maryland: [[35, 100], [15, 40], [45, 120]],
+  "Ikeja GRA": [[40, 110], null, [50, 130]],
+  Magodo: [[45, 120], [25, 70], [55, 140]],
+  Ogudu: [[35, 100], [20, 55], [45, 120]],
+  Festac: [[40, 120], [45, 120], [50, 140]],
+  Ilupeju: [[30, 90], [20, 50], [40, 110]],
+};

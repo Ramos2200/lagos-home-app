@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { formatDate, todayISO, uid } from "./format";
-import { DATA_VERSION, createSeedData } from "./seed";
+import { DATA_VERSION, SEED_LOCAL_NOTES, createSeedData } from "./seed";
 import type { AppData, Inquiry, InquiryStatus, Listing, ListingReport, ListingStatus, ReportStatus, Role, SavedSearch, SeekerPreferences, TrustCheck, User } from "./types";
 
 const STORAGE_KEY = "lagos-homes-demo-v1";
@@ -98,6 +98,11 @@ function migrate(parsed: AppData): AppData {
     // The sample "Diesel levy (monthly)" was stored as a one-off cost; mark it as the monthly cost it is.
     listings: parsed.listings.map((l) => ({
       ...l,
+      // Flooding and nearby-places notes were added later: fill them on sample listings that have never had them.
+      details:
+        l.isDemo && SEED_LOCAL_NOTES[l.id] && l.details.flooding === undefined && l.details.nearby === undefined
+          ? { ...l.details, ...SEED_LOCAL_NOTES[l.id] }
+          : l.details,
       costs: {
         ...l.costs,
         other: l.costs.other?.map((o) =>

@@ -5,20 +5,21 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DemoBadge, OccupancyBadge } from "@/components/Badges";
 import { ContactPlaceholder, PhoneIcon, ShareButton, WhatsAppIcon } from "@/components/ContactActions";
+import { AffordabilityCalculator } from "@/components/AffordabilityCalculator";
 import { CostBreakdownView } from "@/components/CostBreakdownView";
 import { Gallery } from "@/components/Gallery";
 import { ArrowLeftIcon, BathIcon, BedIcon, CalendarIcon, CheckIcon, InfoIcon, PinIcon } from "@/components/Icons";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { ReportDialog } from "@/components/ReportDialog";
-import { AvailabilityLine, ListingCard, PriceTag, SaveButton, priceUnit } from "@/components/ListingCard";
+import { AvailabilityLine, ListingBadges, ListingCard, PriceTag, SaveButton, priceUnit } from "@/components/ListingCard";
 import { PriceHistory } from "@/components/PriceHistory";
 import { Avatar } from "@/components/SiteHeader";
 import { ListingChecksGrid } from "@/components/ListingChecks";
 import { TrustPanel } from "@/components/TrustPanel";
-import { NEARBY } from "@/lib/areas";
+import { NEARBY, TRAVEL_DESTINATIONS, TRAVEL_GUIDE } from "@/lib/areas";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL, STALE_AFTER_DAYS } from "@/lib/constants";
 import { daysSince, formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
-import { availabilityInfo, feeParts, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
+import { availabilityInfo, daysListedLabel, feeParts, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
 import { useStore } from "@/lib/store";
 import type { InquiryType, Listing } from "@/lib/types";
 
@@ -80,6 +81,8 @@ export function ListingDetailView() {
     ["Security", listing.details.security],
     ["Parking", listing.details.parking],
     ["Road access", listing.details.roadAccess],
+    ["Flooding", listing.details.flooding ?? ""],
+    ["Nearby", listing.details.nearby ?? ""],
   ];
 
   const contactProps = {
@@ -155,8 +158,10 @@ export function ListingDetailView() {
               </span>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
+              <ListingBadges listing={listing} onPhoto={false} />
               <DemoBadge />
               <OccupancyBadge occupancy={listing.occupancy} />
+              <span className="text-xs font-medium text-ink-500">Listed {daysListedLabel(listing)}</span>
             </div>
           </header>
 
@@ -193,6 +198,18 @@ export function ListingDetailView() {
               </p>
               <div className="mt-4">
                 <CostBreakdownView listing={listing} />
+              </div>
+            </section>
+
+            <section id="afford" className="scroll-mt-20 p-5 sm:p-6" aria-labelledby="afford-title">
+              <h2 id="afford-title" className="section-title">{listing.purpose === "rent" ? "Can I afford it?" : "Mortgage and affordability estimate"}</h2>
+              <p className="muted mt-0.5">
+                {listing.purpose === "rent"
+                  ? "See what share of your pay this home would take, using the costs above."
+                  : "Try a deposit, rate and loan length to see a rough monthly repayment."}
+              </p>
+              <div className="mt-4">
+                <AffordabilityCalculator listing={listing} />
               </div>
             </section>
 
@@ -234,15 +251,17 @@ export function ListingDetailView() {
             </section>
 
             <section className="p-5 sm:p-6" aria-labelledby="details-title">
-              <h2 id="details-title" className="section-title">Water, power, security & access</h2>
-              <dl className="mt-3 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+              <h2 id="details-title" className="section-title">Neighbourhood & living</h2>
+              <p className="muted mt-0.5">Power, water, flooding and getting around — as described by the {agent ? "agent" : "owner"}. Ask about anything that matters to you before a viewing.</p>
+              <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
                 {facts.map(([k, v]) => (
-                  <div key={k} className="border-l-2 border-sand-200 pl-3">
+                  <div key={k} className={`border-l-2 pl-3 ${k === "Flooding" && v ? "border-sky-300" : "border-sand-200"}`}>
                     <dt className="text-xs font-medium text-ink-500">{k}</dt>
-                    <dd className="mt-0.5 text-sm text-ink-900">{v || "Not provided"}</dd>
+                    <dd className={`mt-0.5 text-sm ${v ? "text-ink-900" : "text-ink-500 italic"}`}>{v || "Not provided"}</dd>
                   </div>
                 ))}
               </dl>
+              <TravelGuide area={listing.area} />
             </section>
 
             <section className="p-5 sm:p-6">
@@ -476,6 +495,30 @@ function Fact({ label, sub, children }: { label: string; sub?: string; children:
       <div className="text-xs font-medium text-ink-500">{label}</div>
       <div className="mt-1 font-semibold text-ink-900">{children}</div>
       {sub && <div className="text-xs text-ink-500">{sub}</div>}
+    </div>
+  );
+}
+
+/** Rough drive times from the listing's area. A hand-made guide, clearly not live traffic. */
+function TravelGuide({ area }: { area: string }) {
+  const row = TRAVEL_GUIDE[area];
+  if (!row) return null;
+  return (
+    <div className="mt-5 rounded-xl border border-sand-200 p-4">
+      <h3 className="text-sm font-bold text-ink-900">Rough drive times from {area}</h3>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+        {TRAVEL_DESTINATIONS.map((dest, i) => {
+          const t = row[i];
+          return (
+            <li key={dest} className="rounded-lg bg-sand-50 px-3 py-2 ring-1 ring-sand-200">
+              <p className="text-xs font-medium text-ink-500">To {dest}</p>
+              <p className="mt-0.5 text-sm font-bold text-ink-900">{t ? `${t[0]}–${t[1]} min` : "You're already there"}</p>
+              {t && <p className="text-[11px] text-ink-500">quiet roads – rush hour</p>}
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 text-xs text-ink-500">A rough guide made for this demo, not live traffic. Lagos journey times change a lot with time of day, rain and route.</p>
     </div>
   );
 }

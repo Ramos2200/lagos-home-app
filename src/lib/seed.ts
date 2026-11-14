@@ -94,6 +94,28 @@ const D = (water: string, power: string, security: string, parking: string, road
   roadAccess,
 });
 
+/**
+ * Flooding and nearby-places notes for the sample listings, as a lister might describe them (fictional).
+ * Some listings are left without notes on purpose so the app shows "Not provided".
+ * Also used to fill these new fields on sample listings in data saved before they existed.
+ */
+export const SEED_LOCAL_NOTES: Record<string, Pick<ListingDetails, "flooding" | "nearby">> = {
+  "lst-lekki-3bed-palmgrove": { flooding: "Close stays dry; Admiralty Way end can flood for a few hours after heavy rain", nearby: "Supermarket and pharmacy 5 min walk; schools on Admiralty Way" },
+  "lst-yaba-miniflat": { flooding: "No flooding on the street reported by the owner", nearby: "Bus stop 3 min walk; Yaba market and tech hubs nearby" },
+  "lst-ikoyi-serviced-2bed": { flooding: "None reported in the building; some Ikoyi roads flood in heavy rain", nearby: "Restaurants, gyms and a hospital within 10 min drive" },
+  "lst-ajah-terrace-sale": { flooding: "Access road can flood in the rainy season; estate drains being upgraded", nearby: "Ajah market and schools 10–15 min drive" },
+  "lst-magodo-owner-occupied-sale": { flooding: "Owner says the estate does not flood", nearby: "Primary and secondary schools inside the estate; shopping 10 min drive" },
+  "lst-surulere-2bed": { nearby: "Walking distance to shops and a bus stop; stadium area nearby" },
+  "lst-gbagada-selfcon": { flooding: "Last 200m of the road gets muddy and can flood in heavy rain", nearby: "Bus stop 5 min walk; general hospital nearby" },
+  "lst-ikate-4bed-semi": { flooding: "No flooding inside the estate reported", nearby: "Supermarkets on Lekki–Epe Expressway, 5 min drive" },
+  "lst-chevron-3bed-sale": { flooding: "Estate roads drain well; the expressway junction can flood", nearby: "Schools and a mall within 10 min drive" },
+  "lst-ikeja-gra-bungalow": { flooding: "None reported", nearby: "Ikeja City Mall and the airport about 15 min drive" },
+  "lst-maryland-2bed": { nearby: "Maryland Mall and bus terminals nearby" },
+  "lst-sangotedo-bungalow-sale": { flooding: "Street is untarred and can flood in the rainy season", nearby: "Market and schools 10 min drive" },
+  "lst-ogudu-3bed": { flooding: "Owner says no flooding on the street", nearby: "Schools and supermarkets in Ogudu GRA" },
+  "lst-festac-2bed-quarterly": { flooding: "Some Festac avenues flood in heavy rain; this close usually stays passable" },
+};
+
 type Seed = Omit<Listing, "createdAt" | "updatedAt" | "isDemo" | "priceHistory" | "checks"> & {
   checks?: Partial<Listing["checks"]>;
   priceHistory?: Listing["priceHistory"];
@@ -563,6 +585,7 @@ function listings(): Listing[] {
     const ownerName = people.find((u) => u.id === s.ownerId)?.name;
     return {
       ...s,
+      details: { ...s.details, ...SEED_LOCAL_NOTES[s.id] },
       ownerDisplayName: s.listedBy === "agent" ? (s.ownerDisplayName ?? ownerName ?? "Private owner") : undefined,
       checks: {
         ownerAuthorization:
