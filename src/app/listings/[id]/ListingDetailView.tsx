@@ -11,12 +11,14 @@ import { Gallery } from "@/components/Gallery";
 import { ArrowLeftIcon, BathIcon, BedIcon, CalendarIcon, CheckIcon, InfoIcon, PinIcon } from "@/components/Icons";
 import { InquiryDialog } from "@/components/InquiryDialog";
 import { ReportDialog } from "@/components/ReportDialog";
+import { SavedNote } from "@/components/SavedNote";
 import { AvailabilityLine, ListingBadges, ListingCard, PriceTag, SaveButton, priceUnit } from "@/components/ListingCard";
 import { PriceHistory } from "@/components/PriceHistory";
 import { Avatar } from "@/components/SiteHeader";
 import { ListingChecksGrid } from "@/components/ListingChecks";
 import { TrustPanel } from "@/components/TrustPanel";
-import { NEARBY, TRAVEL_DESTINATIONS, TRAVEL_GUIDE } from "@/lib/areas";
+import { NEARBY } from "@/lib/areas";
+import { TravelGuide } from "@/components/TravelGuide";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL, STALE_AFTER_DAYS } from "@/lib/constants";
 import { daysSince, formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
 import { availabilityInfo, daysListedLabel, feeParts, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
@@ -163,6 +165,11 @@ export function ListingDetailView() {
               <OccupancyBadge occupancy={listing.occupancy} />
               <span className="text-xs font-medium text-ink-500">Listed {daysListedLabel(listing)}</span>
             </div>
+            {data.savedListingIds.includes(listing.id) && (
+              <div className="mt-3">
+                <SavedNote listingId={listing.id} />
+              </div>
+            )}
           </header>
 
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-sand-200 bg-sand-200 shadow-card sm:grid-cols-4">
@@ -290,7 +297,10 @@ export function ListingDetailView() {
                     </div>
                   </div>
                 )}
-                <p className="mt-4 text-xs text-ink-500">The exact address is shared by the lister after you arrange a viewing.</p>
+                <Link href={`/areas/${encodeURIComponent(listing.area)}`} className="link mt-4 inline-block text-sm">
+                  Area guide: {listing.area} prices, notes and travel times
+                </Link>
+                <p className="mt-2 text-xs text-ink-500">The exact address is shared by the lister after you arrange a viewing.</p>
               </div>
               <div className="flex h-28 items-center justify-center border-t border-sand-200 bg-sand-50 text-sm text-ink-500">
                 <span className="rounded-lg border border-sand-200 bg-white px-3 py-1.5">Map placeholder</span>
@@ -380,7 +390,7 @@ function PricePanel({
   total: number;
   notProvided: string[];
   contactPerson?: { name: string };
-  agent?: { agencyName?: string };
+  agent?: { id: string; agencyName?: string };
   canContact: boolean;
   isMine: boolean;
   onViewing: () => void;
@@ -430,6 +440,7 @@ function PricePanel({
             </div>
             <div className="text-ink-500">{agent ? `Agent · ${agent.agencyName ?? "Independent"}` : "Owner, listing directly"}</div>
             {agent && listing.ownerDisplayName && <div className="text-xs text-ink-500">On behalf of: {listing.ownerDisplayName}</div>}
+            {agent && <Link href={`/agents/${agent.id}`} className="link text-xs">View agent profile</Link>}
           </div>
         </div>
       )}
@@ -495,30 +506,6 @@ function Fact({ label, sub, children }: { label: string; sub?: string; children:
       <div className="text-xs font-medium text-ink-500">{label}</div>
       <div className="mt-1 font-semibold text-ink-900">{children}</div>
       {sub && <div className="text-xs text-ink-500">{sub}</div>}
-    </div>
-  );
-}
-
-/** Rough drive times from the listing's area. A hand-made guide, clearly not live traffic. */
-function TravelGuide({ area }: { area: string }) {
-  const row = TRAVEL_GUIDE[area];
-  if (!row) return null;
-  return (
-    <div className="mt-5 rounded-xl border border-sand-200 p-4">
-      <h3 className="text-sm font-bold text-ink-900">Rough drive times from {area}</h3>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-        {TRAVEL_DESTINATIONS.map((dest, i) => {
-          const t = row[i];
-          return (
-            <li key={dest} className="rounded-lg bg-sand-50 px-3 py-2 ring-1 ring-sand-200">
-              <p className="text-xs font-medium text-ink-500">To {dest}</p>
-              <p className="mt-0.5 text-sm font-bold text-ink-900">{t ? `${t[0]}–${t[1]} min` : "You're already there"}</p>
-              {t && <p className="text-[11px] text-ink-500">quiet roads – rush hour</p>}
-            </li>
-          );
-        })}
-      </ul>
-      <p className="mt-3 text-xs text-ink-500">A rough guide made for this demo, not live traffic. Lagos journey times change a lot with time of day, rain and route.</p>
     </div>
   );
 }

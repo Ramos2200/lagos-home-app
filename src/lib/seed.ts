@@ -659,6 +659,7 @@ export function createSeedData(): AppData {
     inquiries: inquiries(),
     currentUserId: null,
     savedListingIds: [],
+    savedNotes: {},
     savedSearches: [],
     recentlyViewed: [],
     viewCounts: {},

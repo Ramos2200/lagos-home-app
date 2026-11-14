@@ -171,3 +171,33 @@ export const TRAVEL_GUIDE: Record<string, [[number, number] | null, [number, num
   Festac: [[40, 120], [45, 120], [50, 140]],
   Ilupeju: [[30, 90], [20, 50], [40, 110]],
 };
+
+export interface AreaNote {
+  side: "Island" | "Mainland";
+  /** One-line summary for tiles. */
+  tagline: string;
+  /** A short general overview. Written for this demo — not local research. */
+  overview: string;
+  /** Things renters and buyers commonly ask about here. */
+  askAbout: string[];
+}
+
+/** General notes for area guides. Demo content: always shown with a note saying so. */
+export const AREA_NOTES: Record<string, AreaNote> = {
+  "Lekki Phase 1": { side: "Island", tagline: "Estates, restaurants and offices", overview: "A busy, well-known part of the Lekki corridor with gated closes, serviced flats and plenty of shops and restaurants. Popular with people working on the Island.", askAbout: ["Flooding on main roads after heavy rain", "Service charge and what it covers", "Traffic on Admiralty Way and the Lekki–Epe Expressway"] },
+  Ikate: { side: "Island", tagline: "Newer estates off the expressway", overview: "Sits along the Lekki–Epe Expressway between Lekki Phase 1 and Chevron, with many newer estates and terraces.", askAbout: ["Estate road condition", "Estate power arrangements", "Rush-hour access to the expressway"] },
+  Chevron: { side: "Island", tagline: "Family estates, quieter streets", overview: "Named after the large office campus nearby. Mostly residential estates, with schools and shopping a short drive away.", askAbout: ["Drainage at estate entrances", "Generator hours and diesel levies", "School runs in rush hour"] },
+  Ajah: { side: "Island", tagline: "More space for the money", overview: "Further along the Lekki corridor, with a wide mix of estates and lower rents than Lekki Phase 1. Traffic towards the Island can be heavy.", askAbout: ["Flooding on access roads in the rainy season", "Daily travel time to work", "Estate security and gates"] },
+  Sangotedo: { side: "Island", tagline: "Growing area, newer builds", overview: "A fast-growing area beyond Ajah with many new homes and plots. Roads and services are still developing in places.", askAbout: ["Untarred or unfinished roads", "Water and power supply", "Distance to markets and schools"] },
+  Ikoyi: { side: "Island", tagline: "Leafy, central and premium", overview: "One of the most central and expensive parts of Lagos, with apartment blocks, serviced flats and older large plots close to VI.", askAbout: ["Service charges, which can be high", "Parking allocation", "Building management and power backup"] },
+  "Victoria Island": { side: "Island", tagline: "Business district living", overview: "A major business and nightlife district. Homes are mostly apartments and penthouses close to offices, hotels and restaurants.", askAbout: ["Noise and traffic around busy streets", "Service charge and diesel costs", "Flooding on some streets in heavy rain"] },
+  Yaba: { side: "Mainland", tagline: "Campuses, tech hubs, good transport", overview: "Central Mainland area known for universities, tech hubs and markets. Popular with students and young professionals, with good bus links.", askAbout: ["Water source (borehole or not)", "Prepaid meter and power hours", "Street noise near markets"] },
+  Surulere: { side: "Mainland", tagline: "Central, established and lively", overview: "A large, long-established Mainland district with a mix of older blocks and newer flats, and easy access to Yaba and the Island bridges.", askAbout: ["Age and condition of the building", "Street parking", "Shared generator arrangements"] },
+  "Ikeja GRA": { side: "Mainland", tagline: "Quiet streets near the airport", overview: "A planned residential area in Ikeja with bigger plots and quieter streets, close to the airport, malls and offices.", askAbout: ["Power backup for larger homes", "Security on the street", "Commute to the Island"] },
+  Maryland: { side: "Mainland", tagline: "Well connected, mid-range", overview: "A busy junction area linking Ikeja, Gbagada and the Island routes, with flats close to the mall and transport.", askAbout: ["Traffic around the junction", "Block security", "Water supply"] },
+  Gbagada: { side: "Mainland", tagline: "Practical and central", overview: "A residential Mainland area between Ikeja and the Third Mainland Bridge, with phases of estates and good access to the Island.", askAbout: ["Road condition on side streets", "Flooding in low-lying streets", "Bridge traffic at rush hour"] },
+  Magodo: { side: "Mainland", tagline: "Gated family estates", overview: "Largely made up of gated estates with schools inside or nearby. Popular with families wanting space on the Mainland.", askAbout: ["Estate dues and what they cover", "Distance to the main road", "Gate rules for visitors"] },
+  Ogudu: { side: "Mainland", tagline: "Calm GRA close to the bridge", overview: "A quiet residential area with a GRA, close to the Third Mainland Bridge and the Ikorodu Road routes.", askAbout: ["Street flooding", "Estate security", "Access roads in the rainy season"] },
+  Festac: { side: "Mainland", tagline: "Planned town, lower rents", overview: "A large planned town with numbered avenues and closes. Rents are usually lower, and some tenancies are paid quarterly.", askAbout: ["Which avenues flood in heavy rain", "Payment terms (quarterly or yearly)", "Travel time to the Island"] },
+  Ilupeju: { side: "Mainland", tagline: "Mixed homes and industry", overview: "A mix of residential streets and light industry near Maryland and Yaba, with good road links.", askAbout: ["Noise from nearby businesses", "Road access", "Power supply"] },
+};

@@ -8,6 +8,7 @@ import { CheckIcon, ShieldIcon } from "@/components/Icons";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingPhoto } from "@/components/ListingPhoto";
 import { AREA_IMAGES, HERO_IMAGE } from "@/lib/images";
+import { areaHref } from "@/lib/area-guide";
 import { EmptyState, Section } from "@/components/ui";
 import { areasToQuery } from "@/lib/areas";
 import { BUDGET_PRESETS, KEY_AMENITY_FILTERS, PROPERTY_TYPES } from "@/lib/constants";
@@ -283,12 +284,14 @@ export default function HomePage() {
         {/* ── Explore areas ──────────────────────────── */}
         <section aria-labelledby="areas-title">
           <h2 id="areas-title" className="text-[24px] font-extrabold tracking-tight sm:text-[28px]">Explore Lagos neighbourhoods</h2>
-          <p className="muted mt-1">Homes {mode === "rent" ? "for rent" : "for sale"} by area.</p>
+          <p className="muted mt-1">
+            Area guides with typical asking prices, what to ask about and the homes listed. <Link href="/areas" className="link">All area guides</Link>
+          </p>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             {POPULAR.map((p, i) => (
               <Link
                 key={p.q}
-                href={`/search?mode=${mode}&q=${encodeURIComponent(p.q)}`}
+                href={areaHref(p.q)}
                 className="group relative block aspect-[4/3] overflow-hidden rounded-xl sm:aspect-[16/10]"
               >
                 {AREA_IMAGES[p.q] ? (

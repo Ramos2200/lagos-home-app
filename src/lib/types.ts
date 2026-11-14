@@ -199,6 +199,8 @@ export interface AppData {
   inquiries: Inquiry[];
   currentUserId: string | null;
   savedListingIds: string[];
+  /** Private notes on saved homes, by listing id. Kept in this browser only and never shown to listers. */
+  savedNotes: Record<string, string>;
   savedSearches: SavedSearch[];
   /** Listing pages opened in this browser, newest first, per signed-in person (null = guest). */
   recentlyViewed: RecentView[];

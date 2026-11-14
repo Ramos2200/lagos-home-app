@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AvailabilityLine, PriceTag } from "@/components/ListingCard";
+import { ShareButton } from "@/components/ContactActions";
 import { CheckIcon, HeartIcon, PinIcon } from "@/components/Icons";
+import { SavedNote } from "@/components/SavedNote";
 import { ListingPhoto } from "@/components/ListingPhoto";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL } from "@/lib/constants";
@@ -89,12 +91,16 @@ export default function SavedHomesPage() {
                       {l.landmark ? ` · ${l.landmark}` : ""}
                     </p>
                     <AvailabilityLine listing={l} compact />
+                    <div className="mt-auto pt-2">
+                      <SavedNote listingId={l.id} />
+                    </div>
                   </div>
                   <div className="flex items-center justify-between gap-2 border-t border-sand-200 bg-sand-50 px-4 py-2.5">
                     <label className={`flex items-center gap-2 text-sm font-medium ${full ? "text-ink-300" : "text-ink-700"}`}>
                       <input type="checkbox" className="h-4 w-4 accent-brand-600" checked={on} disabled={full} onChange={() => toggleCompare(l.id)} />
                       Compare
                     </label>
+                    <ShareButton listing={l} className="btn-ghost btn-sm ml-auto" />
                     <button
                       className="btn-ghost btn-sm text-red-700 hover:!text-red-800"
                       onClick={() => {
@@ -126,9 +132,11 @@ export default function SavedHomesPage() {
 }
 
 function CompareTable({ listings, onRemove }: { listings: Listing[]; onRemove: (id: string) => void }) {
+  const { data } = useStore();
   const money = (n?: number) => (typeof n === "number" ? (n === 0 ? "None" : naira(n)) : <span className="text-ink-500 italic">Not provided</span>);
   const rows: { label: string; cell: (l: Listing) => React.ReactNode }[] = [
     { label: "Price", cell: (l) => <PriceTag listing={l} size="sm" /> },
+    { label: "Your note", cell: (l) => data.savedNotes[l.id] || <span className="text-ink-500">—</span> },
     {
       label: "First payment estimate",
       cell: (l) => {

@@ -92,7 +92,8 @@ export function ContactPlaceholder({ kind, listing, name, onClose }: { kind: Kin
 export function ShareButton({ listing, className = "" }: { listing: Listing; className?: string }) {
   const [done, setDone] = useState("");
   async function share() {
-    const url = window.location.href;
+    // Always the listing page itself, so sharing from Saved homes (or a #section link) sends the right page.
+    const url = `${window.location.origin}/listings/${listing.id}`;
     try {
       if (navigator.share) {
         await navigator.share({ title: listing.title, text: `${listing.title} — ${locationLine(listing)}`, url });
@@ -106,7 +107,7 @@ export function ShareButton({ listing, className = "" }: { listing: Listing; cla
     setTimeout(() => setDone(""), 2000);
   }
   return (
-    <button type="button" onClick={share} className={className} aria-label="Share listing">
+    <button type="button" onClick={share} className={className} aria-label={done ? `${done}: ${listing.title}` : `Share ${listing.title}`}>
       <ShareIcon size={16} /> {done || "Share"}
     </button>
   );

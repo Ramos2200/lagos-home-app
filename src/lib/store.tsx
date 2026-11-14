@@ -54,6 +54,8 @@ interface StoreApi {
   /** Adds a demo staff account to existing data (only when someone asks for it). */
   createStaffUser: () => string;
   toggleSaved: (listingId: string) => void;
+  /** Private note on a saved home; an empty note removes it. */
+  setSavedNote: (listingId: string, note: string) => void;
   setPreferences: (p: SeekerPreferences) => void;
   dismissChecklist: () => void;
   saveSearch: (label: string, query: string) => SavedSearch;
@@ -111,6 +113,7 @@ function migrate(parsed: AppData): AppData {
       },
     })),
     savedListingIds: parsed.savedListingIds ?? [],
+    savedNotes: parsed.savedNotes ?? {},
     savedSearches: parsed.savedSearches ?? [],
     recentlyViewed: parsed.recentlyViewed ?? [],
     viewCounts: parsed.viewCounts ?? {},
@@ -148,6 +151,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     inquiries: [],
     currentUserId: null,
     savedListingIds: [],
+    savedNotes: {},
     savedSearches: [],
     recentlyViewed: [],
     viewCounts: {},
@@ -373,6 +377,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           ? d.savedListingIds.filter((x) => x !== listingId)
           : [...d.savedListingIds, listingId],
       })),
+    setSavedNote: (listingId, note) =>
+      setData((d) => {
+        const savedNotes = { ...d.savedNotes };
+        if (note.trim()) savedNotes[listingId] = note.trim();
+        else delete savedNotes[listingId];
+        return { ...d, savedNotes };
+      }),
     setPreferences: (p) => mutateUser((u) => ({ ...u, preferences: p })),
     dismissChecklist: () => mutateUser((u) => ({ ...u, checklistDismissed: true })),
     saveSearch: (label, query) => {

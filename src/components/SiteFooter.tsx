@@ -18,6 +18,8 @@ export function SiteFooter() {
         <div className="flex flex-col gap-1">
           <Link href="/search?mode=rent" className="hover:text-brand-700">Homes for rent</Link>
           <Link href="/search?mode=sale" className="hover:text-brand-700">Homes for sale</Link>
+          <Link href="/agents" className="hover:text-brand-700">Agents</Link>
+          <Link href="/areas" className="hover:text-brand-700">Area guides</Link>
           <Link href="/trust" className="hover:text-brand-700">How checks & statuses work</Link>
           <Link href="/moderation" className="hover:text-brand-700">Report queue (demo staff)</Link>
         </div>
