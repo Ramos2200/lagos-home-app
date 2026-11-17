@@ -6,7 +6,7 @@ import { AvailabilityLine, PriceTag } from "@/components/ListingCard";
 import { ShareButton } from "@/components/ContactActions";
 import { CheckIcon, HeartIcon, PinIcon } from "@/components/Icons";
 import { SavedNote } from "@/components/SavedNote";
-import { ListingPhoto } from "@/components/ListingPhoto";
+import { ListingCover } from "@/components/ListingCover";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL } from "@/lib/constants";
 import { formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
@@ -81,7 +81,7 @@ export default function SavedHomesPage() {
               return (
                 <li key={l.id} className={`card flex flex-col overflow-hidden ${on ? "ring-2 ring-brand-600" : ""}`}>
                   <Link href={`/listings/${l.id}`} tabIndex={-1} aria-hidden>
-                    <ListingPhoto seed={l.photoSeed} type={l.propertyType} className="aspect-[3/2]" showTag={false} />
+                    <ListingCover listing={l} className="aspect-[3/2]" />
                   </Link>
                   <div className="flex flex-1 flex-col gap-1.5 p-4">
                     <PriceTag listing={l} size="sm" />
@@ -203,7 +203,7 @@ function CompareTable({ listings, onRemove }: { listings: Listing[]; onRemove: (
               <th scope="col" className="sticky left-0 z-10 w-36 bg-white p-3 text-xs font-medium text-ink-500">Home</th>
               {listings.map((l) => (
                 <th key={l.id} scope="col" className="min-w-[180px] border-l border-sand-200 p-3 font-normal">
-                  <ListingPhoto seed={l.photoSeed} type={l.propertyType} className="aspect-[3/2] rounded-lg" showTag={false} />
+                  <ListingCover listing={l} className="aspect-[3/2] rounded-lg" />
                   <Link href={`/listings/${l.id}`} className="mt-2 line-clamp-2 block font-semibold text-ink-900 hover:underline">{l.title}</Link>
                   <span className="mt-1 flex items-center justify-between gap-2 text-xs text-ink-500">
                     {l.purpose === "rent" ? "For rent" : "For sale"} · {effectiveStatus(l) === "available" ? "Live" : "Check status"}

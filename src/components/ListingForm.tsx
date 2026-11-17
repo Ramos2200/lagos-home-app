@@ -1,5 +1,6 @@
 "use client";
 
+import { PhotoUploader } from "./PhotoUploader";
 import { cloneElement, isValidElement, useEffect, useRef, useState } from "react";
 import { AMENITIES, AMENITY_LABEL, LAGOS_AREAS, OCCUPANCY_LABEL, PROPERTY_TYPES, PROPERTY_TYPE_LABEL, STATUS_OPTIONS, statusLabel } from "@/lib/constants";
 import { FREQUENCY_LABEL, formatDate, naira, todayISO } from "@/lib/format";
@@ -42,6 +43,8 @@ export interface ListingFormValues {
   availableFrom: string;
   description: string;
   videoUrl: string;
+  /** Uploaded photos (data URLs). Saved separately from the listing — see lib/photos. */
+  photos: string[];
   ownerDisplayName: string;
   priceNote: string;
   ownershipConfirmed: boolean;
@@ -83,6 +86,7 @@ export function valuesFromListing(l?: Listing): ListingFormValues {
     availableFrom: l?.availableFrom ?? todayISO(),
     description: l?.description ?? "",
     videoUrl: l?.videoUrl ?? "",
+    photos: [],
     ownerDisplayName: l?.ownerDisplayName ?? "",
     priceNote: "",
     ownershipConfirmed: !!l,
@@ -198,7 +202,7 @@ export function ListingForm({
       if (raw) {
         const d = JSON.parse(raw) as Draft;
         /* eslint-disable react-hooks/set-state-in-effect */
-        setV({ ...initial, ...d.values });
+        setV({ ...initial, ...d.values, photos: initial.photos });
         setStep(d.step);
         setReached(d.step);
         setRestored(d.savedAt);
@@ -212,10 +216,11 @@ export function ListingForm({
   // Keep the draft up to date.
   useEffect(() => {
     if (!draftKey || !loadedDraft.current) return;
-    const blank = JSON.stringify(v) === JSON.stringify(initial);
+    // Photos are left out of drafts: they are large and would crowd out other saved data.
+    const blank = JSON.stringify({ ...v, photos: [] }) === JSON.stringify({ ...initial, photos: [] });
     try {
       if (blank) localStorage.removeItem(draftKey);
-      else localStorage.setItem(draftKey, JSON.stringify({ savedAt: todayISO(), step, values: v } satisfies Draft));
+      else localStorage.setItem(draftKey, JSON.stringify({ savedAt: todayISO(), step, values: { ...v, photos: [] } } satisfies Draft));
     } catch {}
   }, [v, step, draftKey, initial]);
 
@@ -582,9 +587,7 @@ export function ListingForm({
               <Field label="Video tour link" id="video" optional error={errors.video} hint="Paste a link to a walk-through video you've already posted, e.g. on YouTube or Instagram. It opens on that site.">
                 <input id="video" type="url" inputMode="url" className="field" value={v.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://" />
               </Field>
-              <div className="rounded-xl border border-dashed border-sand-300 bg-sand-50 p-4 text-center text-sm text-ink-500">
-                Photo upload placeholder — this prototype shows illustrated demo images instead of uploading files.
-              </div>
+              <PhotoUploader value={v.photos} onChange={(p) => set("photos", p)} />
             </Section>
           </>
         )}
@@ -618,6 +621,7 @@ export function ListingForm({
                 />
                 <ReviewRow label="Availability" value={`${statusLabel(v.status, v.purpose)} · from ${formatDate(v.availableFrom)} · ${OCCUPANCY_LABEL[v.occupancy]}`} onEdit={() => goTo(2)} />
                 <ReviewRow label="Amenities" value={v.amenities.length ? v.amenities.map((a) => AMENITY_LABEL[a]).join(", ") : "None selected"} onEdit={() => goTo(2)} />
+                <ReviewRow label="Photos &amp; video" value={`${v.photos.length ? `${v.photos.length} photo${v.photos.length === 1 ? "" : "s"}` : "No photos (illustrations shown)"} · ${v.videoUrl.trim() ? "video tour link added" : "no video"}`} onEdit={() => goTo(2)} />
               </dl>
             </Section>
 
@@ -625,7 +629,7 @@ export function ListingForm({
               <div className="rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-brand-900">
                 <p className="font-semibold">What happens when you publish</p>
                 <ul className="mt-1.5 list-disc space-y-1 pl-5">
-                  <li>Your listing appears in search straight away, marked as demo data.</li>
+                  <li>Your listing appears in search straight away.</li>
                   <li>Viewing requests and messages arrive in your dashboard.</li>
                   <li>Confirm it&apos;s still available at least every 30 days, or it shows as “Availability unconfirmed”.</li>
                 </ul>
@@ -662,7 +666,7 @@ export function ListingForm({
                 </Field>
                 <label className="flex items-start gap-2 text-sm">
                   <input type="checkbox" className="mt-0.5 h-4 w-4 accent-brand-600" checked={v.authorizationSubmitted} onChange={(e) => set("authorizationSubmitted", e.target.checked)} />
-                  I have the owner&apos;s written authorization — mark the owner authorization check as “submitted” (demo; no document is uploaded).
+                  I have the owner&apos;s written authorization — mark the owner authorization check as “submitted” (no document is uploaded during the beta).
                 </label>
               </Section>
             )}

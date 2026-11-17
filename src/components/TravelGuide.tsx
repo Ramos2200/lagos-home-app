@@ -21,7 +21,7 @@ export function TravelGuide({ area }: { area: string }) {
           );
         })}
       </ul>
-      <p className="mt-3 text-xs text-ink-500">A rough guide made for this demo, not live traffic. Lagos journey times change a lot with time of day, rain and route.</p>
+      <p className="mt-3 text-xs text-ink-500">A rough guide, not live traffic. Lagos journey times change a lot with time of day, rain and route.</p>
     </div>
   );
 }

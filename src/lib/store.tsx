@@ -422,7 +422,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (existing) return existing.id;
       const staff: User = {
         id: "u-staff-demo",
-        name: "Demo Moderator",
+        name: "IleLagos Moderator",
         email: "moderator.demo@example.com",
         roles: ["seeker"],
         activeRole: "seeker",

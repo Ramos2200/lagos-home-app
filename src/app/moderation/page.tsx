@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Badge, StatusBadge } from "@/components/Badges";
-import { ListingPhoto } from "@/components/ListingPhoto";
+import { ListingCover } from "@/components/ListingCover";
 import { Avatar } from "@/components/SiteHeader";
 import { EmptyState, MessagePage, PageHeader, StatStrip } from "@/components/ui";
 import { REPORT_REASONS, REPORT_REASON_LABEL, REPORT_STATUS_LABEL } from "@/lib/constants";
@@ -22,23 +22,23 @@ export default function ModerationPage() {
     const staff = data.users.filter((u) => u.isStaff);
     return (
       <MessagePage
-        title="Demo staff only"
+        title="Staff only"
         body={
           <>
-            The report queue is for IleLagos staff. In this prototype, staff is just a demo account in this browser — there&apos;s no real staff login.
-            {staff.length === 0 && " No demo staff account exists in your saved data yet."}
+            The report queue is for IleLagos staff. During the beta, staff use a test account in this browser — there&apos;s no separate staff login yet.
+            {staff.length === 0 && " No staff test account exists in this browser yet."}
           </>
         }
         actions={
           staff.length > 0 ? (
             staff.map((u) => (
               <button key={u.id} className="btn-primary" onClick={() => signIn(u.id)}>
-                Continue as {u.name} (demo staff)
+                Continue as {u.name} (staff)
               </button>
             ))
           ) : (
             <button className="btn-primary" onClick={() => signIn(createStaffUser())}>
-              Create a demo staff account
+              Create a staff test account
             </button>
           )
         }
@@ -63,7 +63,7 @@ function Queue({ staff }: { staff: User }) {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
       <PageHeader
-        eyebrow={`Demo moderation · signed in as ${staff.name}`}
+        eyebrow={`Moderation · signed in as ${staff.name}`}
         title="Report queue"
         description="Reports from visitors about scams, duplicates, wrong prices and homes that are no longer available. Stored in this browser only — nothing is sent to the lister or any authority."
       />
@@ -159,7 +159,7 @@ function ReportCard({ report: r, staff }: { report: ListingReport; staff: User }
 
         {l ? (
           <div className="mt-3 flex gap-3">
-            <ListingPhoto seed={l.photoSeed} type={l.propertyType} className="h-16 w-20 shrink-0 rounded-lg" showTag={false} />
+            <ListingCover listing={l} className="h-16 w-20 shrink-0 rounded-lg" />
             <div className="min-w-0 text-sm">
               <Link href={`/listings/${l.id}`} className="font-semibold text-ink-900 hover:underline">{l.title}</Link>
               <p className="text-xs text-ink-500">
@@ -227,7 +227,7 @@ function ReportCard({ report: r, staff }: { report: ListingReport; staff: User }
         </div>
         {confirmPause && l && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900" role="alertdialog" aria-label="Pause listing">
-            Pause “{l.title}”? It will be hidden from search until the lister resumes it. (Demo: no message is sent to the lister.)
+            Pause “{l.title}”? It will be hidden from search until the lister resumes it. (During the beta, no message is sent to the lister.)
             <div className="mt-2 flex gap-2">
               <button
                 className="btn-danger btn-sm"

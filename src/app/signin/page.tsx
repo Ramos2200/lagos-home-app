@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/SiteHeader";
 import { ROLE_LABEL } from "@/lib/constants";
+import { agencyLabel } from "@/lib/agents";
 import { useStore } from "@/lib/store";
 
 export default function SigninPage() {
@@ -14,7 +15,7 @@ export default function SigninPage() {
     <div className="mx-auto max-w-lg px-4 py-10">
       <h1 className="page-title">Sign in</h1>
       <p className="mt-1 text-sm text-ink-500">
-        This prototype has no passwords. Pick a demo account to explore, or{" "}
+        The beta has no passwords yet. Pick a test account to explore, or{" "}
         <Link href="/signup" className="font-semibold text-brand-700">create your own</Link>.
       </p>
 
@@ -41,11 +42,11 @@ export default function SigninPage() {
                 <Avatar name={u.name} size={40} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">
-                    {u.name} {u.isDemo && <span className="font-normal text-ink-500">(demo)</span>}
+                    {u.name} {u.isDemo && <span className="font-normal text-ink-500">· test account</span>}
                   </span>
                   <span className="block text-sm text-ink-500">
-                    {u.isStaff ? "Demo staff · moderation queue" : u.roles.map((r) => ROLE_LABEL[r]).join(" · ")}
-                    {u.agencyName ? ` — ${u.agencyName}` : ""}
+                    {u.isStaff ? "Staff · moderation queue" : u.roles.map((r) => ROLE_LABEL[r]).join(" · ")}
+                    {u.agencyName ? ` — ${agencyLabel(u)}` : ""}
                   </span>
                 </span>
                 <span className="text-sm font-semibold text-brand-700">Continue</span>

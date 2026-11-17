@@ -44,7 +44,7 @@ export default function AccountPage() {
           <h1 className="page-title truncate">{u.name}</h1>
           <p className="text-sm text-ink-500">{u.email} · joined {formatDate(u.createdAt)}</p>
         </div>
-        {u.isDemo && <DemoBadge />}
+        {u.isDemo && <DemoBadge label="Sample account" />}
       </div>
 
       <section className="border-t border-sand-200 pt-7">
@@ -87,7 +87,7 @@ export default function AccountPage() {
         <h2 className="section-title">Your checks</h2>
         <p className="text-sm text-ink-500">Each check is separate, with its own status and date.</p>
         <ul className="mt-2 divide-y divide-sand-200">
-          <CheckRow label="Identity" kind="identity" help="Placeholder — no ID documents are collected in this prototype." check={u.checks.identity} />
+          <CheckRow label="Identity" kind="identity" help="Not switched on yet — IleLagos doesn't collect ID documents during the beta." check={u.checks.identity} />
           {u.roles.includes("agent") && (
             <CheckRow label="Agent licence" kind="agentLicensing" help="Placeholder — no registry lookup is performed." check={u.checks.agentLicensing} />
           )}
@@ -97,7 +97,7 @@ export default function AccountPage() {
             className="btn-secondary mt-3 text-sm"
             onClick={() => setUserCheck("identity", { state: "submitted", date: todayISO() })}
           >
-            Simulate “submitted for review” (demo)
+            Mark as submitted (test)
           </button>
         )}
       </section>

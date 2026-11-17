@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { nairaCompact } from "@/lib/format";
+import { useI18n } from "@/lib/i18n";
 import type { Listing } from "@/lib/types";
 
 /**
@@ -66,6 +67,7 @@ export function SearchMap({
 
   // The drawing is scaled to fit the panel (like CSS "contain"); place pins with the same scale and offset.
   const box = useRef<HTMLDivElement>(null);
+  const { t } = useI18n();
   const [size, setSize] = useState({ w: 1000, h: 700 });
   useEffect(() => {
     const el = box.current;
@@ -241,10 +243,10 @@ export function SearchMap({
         <div className="absolute top-3 left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-1.5">
           <div className="flex gap-2">
             <button type="button" onClick={searchHere} className="rounded-full bg-ink-900 px-4 py-2 text-sm font-bold whitespace-nowrap text-white shadow-float hover:bg-ink-700">
-              Search this area
+              {t("map.searchArea")}
             </button>
             <button type="button" onClick={reset} className="rounded-full bg-white px-3 py-2 text-sm font-bold whitespace-nowrap text-ink-900 shadow-float hover:bg-sand-50">
-              Reset
+              {t("map.reset")}
             </button>
           </div>
           {hint && (

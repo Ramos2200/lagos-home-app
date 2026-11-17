@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 import { suggest } from "@/lib/areas";
+import { cleanName } from "@/lib/format";
 import { useStore } from "@/lib/store";
 import { SearchIcon } from "./Icons";
 
@@ -31,7 +32,7 @@ export function AreaSearchInput({
 
   const extras = useMemo(
     () => ({
-      estates: [...new Set(data.listings.map((l) => l.estate).filter(Boolean) as string[])],
+      estates: [...new Set(data.listings.map((l) => cleanName(l.estate)).filter(Boolean) as string[])],
       landmarks: [...new Set(data.listings.map((l) => l.landmark).filter(Boolean) as string[])],
     }),
     [data.listings],

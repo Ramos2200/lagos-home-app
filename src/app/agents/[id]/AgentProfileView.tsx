@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { CheckBadge, DemoBadge } from "@/components/Badges";
+import { CheckBadge } from "@/components/Badges";
 import { ListingCard } from "@/components/ListingCard";
 import { Avatar } from "@/components/SiteHeader";
 import { EmptyState, MessagePage, Segmented } from "@/components/ui";
@@ -25,7 +25,7 @@ export function AgentProfileView() {
     return (
       <MessagePage
         title="Agent not found"
-        body="This profile may have been removed, or the demo data was reset."
+        body="This profile may have been removed."
         actions={<Link href="/agents" className="btn-primary">See all agents</Link>}
       />
     );
@@ -46,7 +46,6 @@ export function AgentProfileView() {
               <h1 className="page-title">{agent.name}</h1>
               <p className="mt-0.5 font-semibold text-ink-700">{agencyLabel(agent)}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <DemoBadge />
                 <span className="text-xs text-ink-500">On IleLagos since {formatDate(agent.createdAt)}</span>
               </div>
             </div>
@@ -74,7 +73,7 @@ export function AgentProfileView() {
 
         <aside className="card self-start p-5">
           <h2 className="text-sm font-bold text-ink-900">Checks on this agent</h2>
-          <p className="mt-0.5 text-xs text-ink-500">Each check is separate. In this prototype nothing is really verified.</p>
+          <p className="mt-0.5 text-xs text-ink-500">Each check is separate. During the beta, IleLagos doesn&apos;t verify anyone yet.</p>
           <ul className="mt-3 space-y-3 text-sm">
             <li>
               <p className="font-semibold text-ink-900">Identity</p>

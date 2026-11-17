@@ -20,8 +20,9 @@ import { TrustPanel } from "@/components/TrustPanel";
 import { NEARBY } from "@/lib/areas";
 import { TravelGuide } from "@/components/TravelGuide";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL, STALE_AFTER_DAYS } from "@/lib/constants";
-import { daysSince, formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
+import { cleanName, daysSince, formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
 import { availabilityInfo, daysListedLabel, feeParts, isVideoLink, linkHost, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
+import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { InquiryType, Listing } from "@/lib/types";
 
@@ -30,6 +31,7 @@ export function ListingDetailView() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data, ready, currentUser, recordView } = useStore();
+  const { t } = useI18n();
   const recorded = useRef<string | null>(null);
 
   // Record a demo "view" once per visit. A lister opening their own listing doesn't count.
@@ -59,7 +61,7 @@ export function ListingDetailView() {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <h1 className="text-xl font-semibold tracking-tight">Listing not found</h1>
-        <p className="mt-2 text-ink-500">It may have been removed, or the demo data was reset.</p>
+        <p className="mt-2 text-ink-500">It may have been removed.</p>
         <Link href="/search" className="btn-primary mt-6">Back to search</Link>
       </div>
     );
@@ -101,7 +103,7 @@ export function ListingDetailView() {
     <div className="mx-auto max-w-6xl px-4 pt-3 pb-40 lg:pb-12">
       <div className="flex items-center justify-between">
         <button onClick={() => router.back()} className="btn-ghost btn-sm -ml-3">
-          <ArrowLeftIcon size={16} /> Back to results
+          <ArrowLeftIcon size={16} /> {t("listing.back")}
         </button>
         <div className="flex items-center gap-2">
           <ShareButton listing={listing} className="btn-ghost btn-sm" />
@@ -162,13 +164,13 @@ export function ListingDetailView() {
               <PinIcon className="mt-1 shrink-0 text-ink-500" />
               <span>
                 <b className="font-semibold text-ink-900">{listing.area}</b>, Lagos
-                {listing.estate && <span className="text-ink-500"> · {listing.estate}</span>}
+                {listing.estate && <span className="text-ink-500"> · {cleanName(listing.estate)}</span>}
                 {listing.landmark && <span className="text-ink-500"> · {listing.landmark}</span>}
               </span>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <ListingBadges listing={listing} onPhoto={false} />
-              <DemoBadge />
+              {listing.isDemo && <DemoBadge />}
               <OccupancyBadge occupancy={listing.occupancy} />
               <span className="text-xs font-medium text-ink-500">Listed {daysListedLabel(listing)}</span>
             </div>
@@ -322,7 +324,7 @@ export function ListingDetailView() {
                 <h2 id="loc-title" className="section-title">Area & landmarks</h2>
                 <dl className="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
                   <LocFact label="Area" value={`${listing.area}, Lagos`} />
-                  {listing.estate && <LocFact label="Estate" value={listing.estate} />}
+                  {listing.estate && <LocFact label="Estate" value={cleanName(listing.estate)} />}
                   {listing.landmark && <LocFact label="Nearby landmark" value={listing.landmark} />}
                   {listing.streetHint && <LocFact label="Street" value={listing.streetHint} />}
                 </dl>
@@ -397,7 +399,7 @@ export function ListingDetailView() {
                 <PhoneIcon size={18} />
               </button>
               <button className="btn-primary flex-1" disabled={!canContact} onClick={() => setDialog("viewing")}>
-                Request a viewing
+                {t("listing.requestViewing")}
               </button>
             </div>
           )}
@@ -439,9 +441,15 @@ function PricePanel({
   onWhatsApp: () => void;
   onCall: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="card p-5 sm:p-6">
       <PriceTag listing={listing} size="lg" />
+      {listing.isDemo && (
+        <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 ring-1 ring-amber-200">
+          <b>Sample home for testing.</b> It isn&apos;t really {listing.purpose === "rent" ? "for rent" : "for sale"} — try requesting a viewing or sending a message to see how it works.
+        </p>
+      )}
       {fees.length > 0 ? (
         <dl className="mt-4 space-y-1.5 text-sm">
           {fees.map((f) => (
@@ -477,9 +485,9 @@ function PricePanel({
           <Avatar name={contactPerson.name} size={40} />
           <div className="min-w-0 text-sm">
             <div className="truncate font-semibold">
-              {contactPerson.name} <span className="font-normal text-ink-500">(demo)</span>
+              {contactPerson.name}
             </div>
-            <div className="text-ink-500">{agent ? `Agent · ${agent.agencyName ?? "Independent"}` : "Owner, listing directly"}</div>
+            <div className="text-ink-500">{agent ? `Agent · ${cleanName(agent.agencyName) ?? "Independent"}` : "Owner, listing directly"}</div>
             {agent && listing.ownerDisplayName && <div className="text-xs text-ink-500">On behalf of: {listing.ownerDisplayName}</div>}
             {agent && <Link href={`/agents/${agent.id}`} className="link text-xs">View agent profile</Link>}
           </div>
@@ -490,7 +498,7 @@ function PricePanel({
         <Link href={`/dashboard/listings/${listing.id}/edit`} className="btn-primary mt-4 w-full">Edit this listing</Link>
       ) : (
         <div className="mt-4 grid gap-2">
-          <button className="btn-primary w-full" disabled={!canContact} onClick={onViewing}>Request a viewing</button>
+          <button className="btn-primary w-full" disabled={!canContact} onClick={onViewing}>{t("listing.requestViewing")}</button>
           <div className="grid grid-cols-2 gap-2">
             <button className="btn-secondary" disabled={!canContact} onClick={onWhatsApp}>
               <span className="text-[#1f9d55]"><WhatsAppIcon size={16} /></span> WhatsApp

@@ -4,10 +4,13 @@ import Link from "next/link";
 import { PROPERTY_TYPE_LABEL } from "@/lib/constants";
 import { FREQUENCY_LABEL, annualize, naira, nairaCompact } from "@/lib/format";
 import { availabilityInfo, daysListedLabel, feeParts, listingBadges, moveInTotal, type AvailabilityInfo } from "@/lib/listing-utils";
+import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Listing } from "@/lib/types";
 import { HeartIcon } from "./Icons";
-import { ListingPhoto, PHOTO_VARIANTS } from "./ListingPhoto";
+import { ListingCover } from "./ListingCover";
+import { PHOTO_VARIANTS } from "./ListingPhoto";
+import { useListingPhotos } from "@/lib/photos";
 
 /** "≈ ₦28.8M per year" for monthly or quarterly rents; null otherwise. */
 export function annualEquivalent(l: Listing): string | null {
@@ -101,6 +104,7 @@ export function ListingBadges({ listing, onPhoto = true }: { listing: Listing; o
 export function SaveButton({ listing, className = "", withLabel = false }: { listing: Listing; className?: string; withLabel?: boolean }) {
   const { data, toggleSaved } = useStore();
   const saved = data.savedListingIds.includes(listing.id);
+  const { t } = useI18n();
   return (
     <button
       type="button"
@@ -111,12 +115,13 @@ export function SaveButton({ listing, className = "", withLabel = false }: { lis
       className={`inline-flex items-center justify-center gap-1.5 rounded-full bg-white text-sm font-semibold shadow-card ring-1 ring-black/5 transition hover:scale-105 active:scale-95 ${saved ? "text-red-600" : "text-ink-700 hover:text-ink-900"} ${className}`}
     >
       <HeartIcon filled={saved} size={18} />
-      {withLabel && <span>{saved ? "Saved" : "Save"}</span>}
+      {withLabel && <span>{saved ? t("listing.saved") : t("listing.save")}</span>}
     </button>
   );
 }
 
-function PhotoCount() {
+function PhotoCount({ listingId }: { listingId: string }) {
+  const real = useListingPhotos(listingId);
   return (
     <span className="inline-flex items-center gap-1 rounded-md bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-white">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
@@ -124,7 +129,7 @@ function PhotoCount() {
         <circle cx="12" cy="13" r="3.5" />
         <path d="M8 6l1.5-2h5L16 6" />
       </svg>
-      {PHOTO_VARIANTS.length} · demo
+      {real.length ? real.length : PHOTO_VARIANTS.length}
     </span>
   );
 }
@@ -190,7 +195,7 @@ function ListedBy({ listing }: { listing: Listing }) {
   const agent = listing.agentId ? data.users.find((u) => u.id === listing.agentId) : undefined;
   return (
     <p className="truncate text-[11px] font-semibold tracking-wide text-ink-500 uppercase">
-      {agent ? `Listed by ${agent.agencyName?.replace(/ \(fictional\)$/, "") ?? agent.name}` : "Listed by owner"} · {daysListedLabel(listing)} · demo
+      {agent ? `Listed by ${agent.agencyName?.replace(/ \(fictional\)$/, "") ?? agent.name}` : "Listed by owner"} · {daysListedLabel(listing)}
     </p>
   );
 }
@@ -216,9 +221,9 @@ export function ListingCard({ listing, layout = "grid" }: { listing: Listing; la
     return (
       <article className="group relative flex overflow-hidden rounded-xl border border-sand-200 bg-white transition hover:shadow-raised">
         <Link href={href} className="relative w-[40%] max-w-[220px] min-w-[124px] shrink-0 overflow-hidden" tabIndex={-1} aria-hidden>
-          <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="h-full min-h-[168px] transition duration-500 group-hover:scale-[1.03]" showTag={false} />
+          <ListingCover listing={listing} className="h-full min-h-[168px] transition duration-500 group-hover:scale-[1.03]" />
           <span className="absolute top-2 left-2 flex max-w-[calc(100%-1rem)] flex-col items-start gap-1"><AvailabilityPill listing={listing} /><ListingBadges listing={listing} /></span>
-          <span className="absolute bottom-1.5 left-1.5"><PhotoCount /></span>
+          <span className="absolute bottom-1.5 left-1.5"><PhotoCount listingId={listing.id} /></span>
         </Link>
         <Link href={href} className="min-w-0 flex-1 space-y-1.5 p-3 pr-11 focus-visible:rounded-r-xl focus-visible:outline-offset-[-3px] sm:p-4 sm:pr-12">
           {price}
@@ -235,9 +240,9 @@ export function ListingCard({ listing, layout = "grid" }: { listing: Listing; la
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-sand-200 bg-white transition hover:shadow-raised">
       <Link href={href} className="relative block overflow-hidden" tabIndex={-1} aria-hidden>
-        <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="aspect-[16/10] transition duration-500 group-hover:scale-[1.03]" showTag={false} />
+        <ListingCover listing={listing} className="aspect-[16/10] transition duration-500 group-hover:scale-[1.03]" />
         <span className="absolute top-3 left-3 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1.5"><AvailabilityPill listing={listing} /><ListingBadges listing={listing} /></span>
-        <span className="absolute bottom-2 left-2"><PhotoCount /></span>
+        <span className="absolute bottom-2 left-2"><PhotoCount listingId={listing.id} /></span>
       </Link>
       <Link href={href} className="flex flex-1 flex-col gap-1.5 px-4 pt-3 pb-4 focus-visible:outline-offset-[-3px]">
         {price}

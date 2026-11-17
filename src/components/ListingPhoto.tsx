@@ -40,7 +40,7 @@ export function ListingPhoto({
       </svg>
       {showTag && (
         <span className="absolute right-2 bottom-2 rounded bg-black/45 px-1.5 py-0.5 text-[10px] font-medium text-white">
-          Demo image · {variant}
+          Illustration · {variant}
         </span>
       )}
     </div>

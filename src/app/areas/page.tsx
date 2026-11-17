@@ -46,7 +46,7 @@ export default function AreasPage() {
           </ul>
         </section>
       ))}
-      <p className="mt-8 text-xs text-ink-500">Prices come from demo listings in this browser and are asking prices, not market prices. Area notes are general and written for the demo.</p>
+      <p className="mt-8 text-xs text-ink-500">Prices come from homes listed on IleLagos and are asking prices, not market prices. Area notes are general guidance.</p>
     </div>
   );
 }

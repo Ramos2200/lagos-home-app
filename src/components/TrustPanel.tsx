@@ -132,7 +132,7 @@ export function ChecksSummary({ listing, lister, agent }: { listing: Listing; li
           <span>Legal title not checked — use a property lawyer before paying</span>
         </li>
       </ul>
-      <p className="mt-2.5 text-[11px] text-ink-500">Demo data: none of these checks were actually performed.</p>
+      <p className="mt-2.5 text-[11px] text-ink-500">During the beta, none of these checks are actually carried out.</p>
     </section>
   );
 }
@@ -163,7 +163,7 @@ export function TrustPanel({
       <div className="mt-2 flex gap-2 rounded-xl bg-amber-50 p-3 text-xs text-amber-900">
         <InfoIcon className="mt-0.5 shrink-0" size={14} />
         <p>
-          Demo data: none of these checks were really performed, and no property title has been legally verified.
+          During the beta, none of these checks are really carried out, and no property title has been legally verified.
           Always do your own legal checks and never pay before viewing.{" "}
           <Link href="/trust" className="font-semibold underline">How checks work</Link>
         </p>
@@ -179,7 +179,7 @@ export function TrustPanel({
           <span className="min-w-0 flex-1">
             <span className="section-title block">What each check means</span>
             <span className="block text-sm text-ink-500">
-              {recorded} of {rows.length} recorded · legal title not checked · demo only
+              {recorded} of {rows.length} recorded · legal title not checked · beta
             </span>
           </span>
           <span className="text-sm font-semibold text-brand-700 group-open:hidden">Show</span>
@@ -202,10 +202,10 @@ export function TrustPanel({
 }
 
 const FUTURE = [
-  { title: "Identity verification", body: "Connect an ID-check provider. Not active — no ID documents are collected in this prototype." },
+  { title: "Identity verification", body: "Connect an ID-check provider. Not active — no ID documents are collected yet." },
   { title: "Agent registry lookup", body: "Look up an agent's registration with the relevant Lagos regulator. Not connected." },
   { title: "Land registry / title search", body: "Order a professional title search. Not connected; nothing here confirms title." },
-  { title: "Payments & escrow", body: "Hold deposits safely until move-in. Not active — do not send money through this demo." },
+  { title: "Payments & escrow", body: "Hold deposits safely until move-in. Not active — don't send money through IleLagos." },
 ];
 
 export function FutureIntegrations({ compact = false, className = "border-t border-sand-200 pt-7" }: { compact?: boolean; className?: string }) {

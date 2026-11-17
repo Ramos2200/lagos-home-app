@@ -116,7 +116,7 @@ export const ROLE_DESCRIPTION: Record<Role, string> = {
 export const CHECK_STATE_LABEL: Record<CheckState, string> = {
   not_started: "Not started",
   submitted: "Submitted · not yet reviewed",
-  demo_reviewed: "Demo review only · not a real check",
+  demo_reviewed: "Sample review only · not a real check",
   self_declared: "Self-declared by lister",
 };
 
@@ -130,37 +130,37 @@ export const CHECK_WORDING: Record<CheckKind, Record<CheckState, string>> = {
   identity: {
     not_started: "ID not submitted",
     submitted: "ID submitted · not yet reviewed",
-    demo_reviewed: "ID reviewed (demo only)",
+    demo_reviewed: "ID reviewed (sample only · not a real check)",
     self_declared: "Identity self-declared",
   },
   agentLicensing: {
     not_started: "Agent licence not submitted",
     submitted: "Agent licence submitted · not yet reviewed",
-    demo_reviewed: "Agent licence reviewed (demo only)",
+    demo_reviewed: "Agent licence reviewed (sample only · not a real check)",
     self_declared: "Agent licence self-declared",
   },
   ownerAuthorization: {
     not_started: "No owner authorization on file",
     submitted: "Owner authorization submitted · not yet reviewed",
-    demo_reviewed: "Owner authorization reviewed (demo only)",
+    demo_reviewed: "Owner authorization reviewed (sample only · not a real check)",
     self_declared: "Owner authorization self-declared",
   },
   ownerDeclaration: {
     not_started: "Ownership not declared",
     submitted: "Ownership documents submitted · not yet reviewed",
-    demo_reviewed: "Ownership reviewed (demo only)",
+    demo_reviewed: "Ownership reviewed (sample only · not a real check)",
     self_declared: "Lister says they own this home",
   },
   documentReview: {
     not_started: "No property documents submitted",
     submitted: "Documents submitted · not yet reviewed",
-    demo_reviewed: "Documents reviewed (demo only) · title not confirmed",
+    demo_reviewed: "Documents reviewed (sample only) · title not confirmed",
     self_declared: "Documents self-declared",
   },
   availability: {
     not_started: "Availability not confirmed",
     submitted: "Availability submitted",
-    demo_reviewed: "Availability reviewed (demo only)",
+    demo_reviewed: "Availability reviewed (sample only)",
     self_declared: "Lister confirmed it's available",
   },
 };

@@ -13,6 +13,7 @@ import { EmptyState, Section } from "@/components/ui";
 import { areasToQuery } from "@/lib/areas";
 import { BUDGET_PRESETS, KEY_AMENITY_FILTERS, PROPERTY_TYPES } from "@/lib/constants";
 import { DEFAULT_FILTERS, filtersToQuery, searchListings, type SearchFilters } from "@/lib/listing-utils";
+import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Purpose } from "@/lib/types";
 
@@ -51,6 +52,7 @@ const STEPS = [
 export default function HomePage() {
   const router = useRouter();
   const { data, ready, currentUser } = useStore();
+  const { t } = useI18n();
   const [mode, setMode] = useState<Purpose>("rent");
   const [q, setQ] = useState("");
   const [type, setType] = useState("");
@@ -106,10 +108,10 @@ export default function HomePage() {
         <HeroBackdrop />
         <div className="relative mx-auto flex min-h-[460px] max-w-7xl flex-col justify-center px-4 py-14 sm:min-h-[540px] lg:px-6">
           <h1 className="max-w-3xl text-[34px] leading-[1.05] font-extrabold tracking-tight sm:text-[56px]">
-            {currentUser ? `Welcome back, ${currentUser.name.split(" ")[0]}.` : "Find your next home in Lagos."}
+            {currentUser ? t("home.welcome", { name: currentUser.name.split(" ")[0] }) : t("home.find")}
           </h1>
           <p className="mt-3 max-w-xl text-[16px] text-white/85 sm:text-[18px]">
-            Rent or buy, with the full cost up front — rent, fees and service charge, before you call anyone.
+            {t("home.sub")}
           </p>
 
           <form
@@ -134,7 +136,7 @@ export default function HomePage() {
                   }}
                   className={tabCls(mode === m)}
                 >
-                  {m === "rent" ? "Rent" : "Buy"}
+                  {m === "rent" ? t("nav.rent") : t("nav.buy")}
                 </button>
               ))}
             </div>
@@ -143,24 +145,24 @@ export default function HomePage() {
               <div className="flex items-stretch gap-1.5">
                 <div className="min-w-0 flex-1">
                   <label htmlFor="home-q" className="sr-only">Where in Lagos?</label>
-                  <AreaSearchInput id="home-q" value={q} onChange={setQ} onPick={(v) => go(v)} placeholder="Enter an area, estate or landmark" size="lg" />
+                  <AreaSearchInput id="home-q" value={q} onChange={setQ} onPick={(v) => go(v)} placeholder={t("home.placeholder")} size="lg" />
                 </div>
                 <button type="submit" className="btn-primary !min-h-12 shrink-0 !px-4 sm:!px-6" aria-label={`Search homes ${mode === "rent" ? "to rent" : "to buy"}`}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-                  <span className="hidden sm:inline">Search</span>
+                  <span className="hidden sm:inline">{t("home.search")}</span>
                 </button>
               </div>
               <div className="mt-1.5 grid grid-cols-3 gap-1.5">
                 <select className="field !min-h-10 !border-sand-200 !px-2.5 text-sm" value={budget} onChange={(e) => setBudget(e.target.value)} aria-label={`Budget${mode === "rent" ? " per year" : ""}`}>
-                  <option value="">{mode === "rent" ? "Budget" : "Price"}</option>
+                  <option value="">{mode === "rent" ? t("home.budget") : t("home.price")}</option>
                   {BUDGET_PRESETS[mode].map((b, i) => <option key={b.label} value={i}>{b.label}</option>)}
                 </select>
                 <select className="field !min-h-10 !border-sand-200 !px-2.5 text-sm" value={beds} onChange={(e) => setBeds(e.target.value)} aria-label="Bedrooms">
-                  <option value="">Beds</option>
+                  <option value="">{t("home.beds")}</option>
                   {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}+ beds</option>)}
                 </select>
                 <select className="field !min-h-10 !border-sand-200 !px-2.5 text-sm" value={type} onChange={(e) => setType(e.target.value)} aria-label="Home type">
-                  <option value="">Type</option>
+                  <option value="">{t("home.type")}</option>
                   {PROPERTY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>

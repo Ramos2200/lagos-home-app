@@ -66,9 +66,9 @@ export function ReportDialog({ listing, onClose }: { listing: Listing; onClose: 
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-700"><CheckIcon size={24} /></div>
             <h2 id="rep-title" className="section-title mt-3">Thanks — report received</h2>
             <p className="mt-1 text-sm text-ink-500">
-              Reference <b className="text-ink-900">{sentId.toUpperCase()}</b>. Demo staff review reports in the moderation queue and mark them Open, Under review or Resolved.
+              Reference <b className="text-ink-900">{sentId.toUpperCase()}</b>. IleLagos staff review reports in the moderation queue and mark them Open, Under review or Resolved.
             </p>
-            <p className="mt-2 text-xs text-ink-500">Demo only: the report is saved in this browser. Nothing is sent to IleLagos, the lister or any authority.</p>
+            <p className="mt-2 text-xs text-ink-500">During the beta, the report is saved in this browser. Nothing is sent to the lister or any authority.</p>
             <button className="btn-primary mt-5 w-full" onClick={onClose} data-autofocus>Done</button>
           </div>
         ) : (
@@ -147,7 +147,7 @@ export function ReportDialog({ listing, onClose }: { listing: Listing; onClose: 
             )}
 
             <p className="rounded-xl bg-sand-100 p-3 text-xs text-ink-700">
-              Reporting as <b>{reporterName}</b>. We don&apos;t ask for your phone, email or ID. If you&apos;ve lost money, contact your bank and the police directly — this demo can&apos;t do that for you.
+              Reporting as <b>{reporterName}</b>. We don&apos;t ask for your phone, email or ID. If you&apos;ve lost money, contact your bank and the police directly — IleLagos can&apos;t do that for you.
             </p>
             <button type="submit" className="btn-primary w-full">Send report</button>
           </form>

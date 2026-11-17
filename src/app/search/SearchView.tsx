@@ -14,6 +14,7 @@ import { nearbyAreasFor, resolveAreas } from "@/lib/areas";
 import { AMENITIES, AMENITY_LABEL, BUDGET_PRESETS, KEY_AMENITY_FILTERS, PROPERTY_TYPES, PROPERTY_TYPE_LABEL } from "@/lib/constants";
 import { nairaCompact } from "@/lib/format";
 import { DEFAULT_FILTERS, filtersFromParams, filtersToQuery, searchListings, type SearchFilters } from "@/lib/listing-utils";
+import { useI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { Purpose } from "@/lib/types";
 
@@ -51,6 +52,7 @@ export function SearchView() {
   const params = useSearchParams();
   const router = useRouter();
   const { data, ready, currentUser, saveSearch } = useStore();
+  const { t } = useI18n();
   const filters = useMemo(() => filtersFromParams(new URLSearchParams(params.toString())), [params]);
   const [qDraft, setQDraft] = useState(filters.q);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -205,7 +207,7 @@ export function SearchView() {
 
           {/* Desktop: Zillow-style filter pills */}
           <div className="hidden items-center gap-2 lg:flex">
-            <FilterPopover label={filters.mode === "rent" ? "For rent" : "For sale"} active>
+            <FilterPopover label={filters.mode === "rent" ? t("search.forRent") : t("search.forSale")} active>
               <p className="label">Show homes</p>
               <Segmented
                 label="Rent or buy"
@@ -217,24 +219,24 @@ export function SearchView() {
                 ]}
               />
             </FilterPopover>
-            <FilterPopover label={b ?? "Price"} active={!!b}>
+            <FilterPopover label={b ?? t("search.price")} active={!!b}>
               <FilterControls filters={filters} apply={apply} only="budget" />
             </FilterPopover>
-            <FilterPopover label={filters.beds ? `${filters.beds}+ beds` : "Beds"} active={!!filters.beds}>
+            <FilterPopover label={filters.beds ? `${filters.beds}+` : t("search.beds")} active={!!filters.beds}>
               <FilterControls filters={filters} apply={apply} only="beds" />
             </FilterPopover>
-            <FilterPopover label={filters.types.length ? `Home type (${filters.types.length})` : "Home type"} active={filters.types.length > 0}>
+            <FilterPopover label={filters.types.length ? `${t("search.homeType")} (${filters.types.length})` : t("search.homeType")} active={filters.types.length > 0}>
               <FilterControls filters={filters} apply={apply} only="type" />
             </FilterPopover>
-            <FilterPopover label={moreCount ? `More (${moreCount})` : "More"} active={moreCount > 0} alignRight>
+            <FilterPopover label={moreCount ? `${t("search.more")} (${moreCount})` : t("search.more")} active={moreCount > 0} alignRight>
               <FilterControls filters={filters} apply={apply} only="more" />
             </FilterPopover>
             {currentUser ? (
               <button type="button" className="btn-primary btn-sm ml-1" onClick={save}>
-                {savedMsg ? "Saved ✓" : "Save search"}
+                {savedMsg ? "✓" : t("search.save")}
               </button>
             ) : (
-              <Link href="/signup" className="btn-primary btn-sm ml-1">Save search</Link>
+              <Link href="/signup" className="btn-primary btn-sm ml-1">{t("search.save")}</Link>
             )}
           </div>
 
@@ -273,18 +275,18 @@ export function SearchView() {
           <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
             <div className="min-w-0">
               <h1 className="text-[22px] leading-tight font-extrabold tracking-tight text-ink-900 sm:text-[26px]">
-                {filters.mode === "rent" ? "Lagos homes for rent" : "Lagos homes for sale"}
+                {filters.mode === "rent" ? t("search.titleRent") : t("search.titleSale")}
                 {filters.q ? ` · ${queryLabel(filters.q)}` : ""}
               </h1>
               <p className="muted mt-0.5">
-                <b className="font-bold text-ink-900">{ready ? results.length : "…"}</b> {results.length === 1 ? "result" : "results"}
+                <b className="font-bold text-ink-900">{ready ? results.length : "…"}</b> {results.length === 1 ? t("search.result") : t("search.results")}
                 {resolved && resolved.length > 1 && <> across {resolved.length} areas</>}
                 {filters.mode === "rent" ? " · rent shown per payment period, fees listed separately" : " · asking prices, fees listed separately"}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <label className="flex items-center gap-1.5 text-sm font-semibold text-ink-700">
-                <span className="hidden sm:inline">Sort:</span>
+                <span className="hidden sm:inline">{t("search.sort")}</span>
                 <select
                   className="field !min-h-9 !w-auto !border-sand-200 !py-1 text-sm font-semibold"
                   value={filters.sort}
@@ -307,7 +309,7 @@ export function SearchView() {
                 className="hidden items-center gap-1.5 rounded-lg border border-sand-200 px-2.5 py-1.5 text-sm font-semibold text-ink-700 hover:border-ink-900 lg:inline-flex"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" /></svg>
-                {showMap ? "Hide map" : "Show map"}
+                {showMap ? t("search.hideMap") : t("search.showMap")}
               </button>
               <div className="inline-flex rounded-lg bg-sand-100 p-0.5" role="group" aria-label="Result layout">
                 {(["grid", "list"] as const).map((v) => (
@@ -351,7 +353,7 @@ export function SearchView() {
                 <p className="text-ink-500">{describeSearch(filters)}</p>
               </div>
               {currentUser ? (
-                <button className="btn-secondary btn-sm" onClick={save}>{savedMsg ? "Saved ✓" : "Save search"}</button>
+                <button className="btn-secondary btn-sm" onClick={save}>{savedMsg ? "✓" : t("search.save")}</button>
               ) : (
                 <Link href="/signup" className="btn-secondary btn-sm">Sign up to save</Link>
               )}
@@ -368,14 +370,14 @@ export function SearchView() {
           className="fixed bottom-5 left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink-900 px-5 py-3 text-sm font-bold text-white shadow-float lg:hidden"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" /></svg>
-          Map
+          {t("search.map")}
         </button>
       )}
       {mapOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-white lg:hidden" role="dialog" aria-modal="true" aria-label="Map of results">
           <div className="flex items-center justify-between border-b border-sand-200 px-4 py-3">
             <p className="font-bold">{results.length} {results.length === 1 ? "home" : "homes"} on the map</p>
-            <button type="button" className="btn-secondary btn-sm" onClick={() => setMapOpen(false)} autoFocus>Show list</button>
+            <button type="button" className="btn-secondary btn-sm" onClick={() => setMapOpen(false)} autoFocus>{t("search.showList")}</button>
           </div>
           <SearchMap key={mapKey} listings={results} activeId={activeId} onActive={setActiveId} onSearchArea={searchArea} className="flex-1" />
         </div>

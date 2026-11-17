@@ -8,12 +8,14 @@ import { AvailabilityCheckItem, InquiryItem, MiniListing, RowList, ViewingItem, 
 import { FlashNotice } from "@/components/FlashNotice";
 import { GettingStarted } from "@/components/GettingStarted";
 import { InquiryList, ManageListingRow } from "@/components/ManageListing";
+import { RemindersPanel } from "@/components/Reminders";
 import { RequireRole } from "@/components/RequireRole";
 import { StatusGuide } from "@/components/StatusGuide";
 import { CheckRow, FutureIntegrations } from "@/components/TrustPanel";
 import { EmptyState, StatStrip } from "@/components/ui";
 import { LAGOS_AREAS } from "@/lib/constants";
 import { daysSince, todayISO } from "@/lib/format";
+import { agencyLabel } from "@/lib/agents";
 import { useStore } from "@/lib/store";
 import type { User } from "@/lib/types";
 
@@ -47,7 +49,7 @@ function AgentDashboard({ user }: { user: User }) {
 
   return (
     <DashboardShell
-      eyebrow={`Agent dashboard · ${user.agencyName ?? "Independent agent"}`}
+      eyebrow={`Agent dashboard · ${agencyLabel(user)}`}
       title={user.name}
       description="Homes you're authorized to represent, new leads and booked viewings."
       actions={addListing}
@@ -86,6 +88,8 @@ function AgentDashboard({ user }: { user: User }) {
             />
           )}
 
+          {mine.length > 0 && <RemindersPanel listings={mine} />}
+
           <Panel
             title="Inquiries needing a reply"
             description="Newest first. Mark each one as replied once you've contacted the person."
@@ -120,7 +124,7 @@ function AgentDashboard({ user }: { user: User }) {
                       <div className="flex shrink-0 flex-col items-end gap-1">
                         <CheckBadge state={l.checks.ownerAuthorization.state} kind="ownerAuthorization" />
                         {l.checks.ownerAuthorization.state === "not_started" && (
-                          <button className="link text-xs" onClick={() => markAuth(l.id)}>Mark as submitted (demo)</button>
+                          <button className="link text-xs" onClick={() => markAuth(l.id)}>Mark as submitted</button>
                         )}
                       </div>
                     }
@@ -141,10 +145,10 @@ function AgentDashboard({ user }: { user: User }) {
             items={[
               { label: "Complete your profile (agency, bio, areas)", done: !!(user.agencyName && user.bio && user.areasServed?.length), action: () => go("profile"), cta: "Edit" },
               {
-                label: "Start your agent licensing check (demo)",
+                label: "Start your agent licence check",
                 done: (user.checks.agentLicensing?.state ?? "not_started") !== "not_started",
                 action: () => setUserCheck("agentLicensing", { state: "submitted", date: todayISO() }),
-                cta: "Simulate",
+                cta: "Start",
               },
               { label: "Add a listing you are authorized to represent", done: mine.length > 0, href: "/dashboard/listings/new?as=agent", cta: "Add" },
               { label: "Submit owner authorization for every listing", done: mine.length > 0 && authMissing.length === 0, action: () => go("listings"), cta: "Review" },
@@ -297,12 +301,12 @@ function AgentProfile({ user }: { user: User }) {
         <div className="mt-3 flex flex-wrap gap-2">
           {user.checks.identity.state === "not_started" && (
             <button className="btn-secondary text-sm" onClick={() => setUserCheck("identity", { state: "submitted", date: todayISO() })}>
-              Simulate identity submission (demo)
+              Submit identity check (test)
             </button>
           )}
           {(user.checks.agentLicensing?.state ?? "not_started") === "not_started" && (
             <button className="btn-secondary text-sm" onClick={() => setUserCheck("agentLicensing", { state: "submitted", date: todayISO() })}>
-              Simulate licence submission (demo)
+              Submit licence check (test)
             </button>
           )}
         </div>

@@ -5,7 +5,7 @@ import { SeekerProfileView } from "@/components/SeekerProfileView";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/Badges";
 import { unreadFor, whenText } from "@/components/InquiryBits";
-import { ListingPhoto } from "@/components/ListingPhoto";
+import { ListingCover } from "@/components/ListingCover";
 import { Avatar } from "@/components/SiteHeader";
 import { EmptyState, MessagePage, PageHeader } from "@/components/ui";
 import { INQUIRY_STATUS_LABEL, INQUIRY_STATUS_TONE } from "@/lib/constants";
@@ -28,7 +28,7 @@ export default function MessagesPage() {
     return (
       <MessagePage
         title="Sign in to see your messages"
-        body="Conversations with listers and renters are kept in your demo account in this browser."
+        body="Conversations with listers and renters are kept in your account in this browser."
         actions={<><Link href="/signin" className="btn-primary">Sign in</Link><Link href="/signup" className="btn-secondary">Create an account</Link></>}
       />
     );
@@ -73,7 +73,7 @@ function Messages({ user }: { user: User }) {
       <PageHeader
         eyebrow="Messages"
         title="Conversations"
-        description="Talk about viewings without sharing your phone or email. Demo only — nothing is sent outside IleLagos."
+        description="Talk about viewings without sharing your phone or email. Messages stay inside IleLagos."
       />
 
       {threads.length === 0 ? (
@@ -174,7 +174,7 @@ function ThreadView({ thread, user, onBack }: { thread: Thread; user: User; onBa
       {/* Header */}
       <header className="flex items-start gap-3 border-b border-sand-200 p-4">
         <button type="button" onClick={onBack} className="btn-ghost btn-sm -ml-2 lg:hidden" aria-label="Back to all conversations">←</button>
-        {l && <ListingPhoto seed={l.photoSeed} type={l.propertyType} className="hidden h-12 w-14 shrink-0 rounded-lg sm:block" showTag={false} />}
+        {l && <ListingCover listing={l} className="hidden h-12 w-14 shrink-0 rounded-lg sm:block" />}
         <div className="min-w-0 flex-1">
           <h2 id="thread-title" className="truncate font-semibold text-ink-900">{other}</h2>
           {l ? <Link href={`/listings/${l.id}`} className="link block truncate text-xs">{l.title}</Link> : <p className="text-xs text-ink-500">Listing removed</p>}
@@ -302,7 +302,7 @@ function ThreadView({ thread, user, onBack }: { thread: Thread; user: User; onBa
           <button type="submit" className="btn-primary shrink-0">Send</button>
         </div>
         <p id="chat-help" className={`mt-1 text-xs ${error ? "font-medium text-red-700" : "text-ink-500"}`} role={error ? "alert" : undefined}>
-          {error || "Ctrl + Enter to send. Demo only — no SMS, email or push notification is sent."}
+          {error || "Ctrl + Enter to send. Messages stay inside IleLagos — no SMS, email or push notification is sent."}
         </p>
       </form>
     </section>

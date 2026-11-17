@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Badge, CheckBadge } from "@/components/Badges";
 import { FutureIntegrations } from "@/components/TrustPanel";
 
-export const metadata = { title: "How checks & statuses work — IleLagos prototype" };
+export const metadata = { title: "How checks & statuses work — IleLagos" };
 
 const CHECKS = [
   ["Identity check", "Applies to the person listing (owner or agent). Shows whether ID was submitted and when."],
@@ -42,8 +42,8 @@ export default function TrustPage() {
           <CheckBadge state="demo_reviewed" />
         </div>
         <p className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
-          This is a prototype. No check is really performed, no demo user or listing is verified, and no property title
-          has been legally verified. Always use a lawyer for title searches and never pay before viewing.
+          IleLagos is in beta. The homes shown are samples for testing, no checks are really carried out yet, nobody is
+          verified, and no property title has been legally verified. Always use a lawyer for title searches and never pay before viewing.
         </p>
       </section>
 

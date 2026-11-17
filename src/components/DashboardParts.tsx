@@ -10,7 +10,7 @@ import type { Inquiry, Listing } from "@/lib/types";
 import { Badge, StatusBadge } from "./Badges";
 import { CheckIcon } from "./Icons";
 import { ContactLine, unreadFor, whenText } from "./InquiryBits";
-import { ListingPhoto } from "./ListingPhoto";
+import { ListingCover } from "./ListingCover";
 
 /* ── Grouping helpers ─────────────────────────────────────── */
 
@@ -35,7 +35,7 @@ export function DemoActivity({ listing }: { listing: Listing }) {
   if (!views && !saved) return null; // never show made-up numbers
   return (
     <p className="text-xs text-ink-500">
-      <span className="mr-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-900 uppercase">Demo</span>
+      <span className="mr-1.5 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-900 uppercase">This browser</span>
       {views > 0 && <>{views} page {views === 1 ? "view" : "views"}</>}
       {views > 0 && saved && " · "}
       {saved && "saved"} in this browser only
@@ -182,7 +182,7 @@ export function ViewingItem({ inquiry, listings, side = "lister" }: { inquiry: I
 export function MiniListing({ listing, right }: { listing: Listing; right?: React.ReactNode }) {
   return (
     <li className="flex items-center gap-3 px-4 py-3">
-      <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="h-12 w-14 shrink-0 rounded-lg" showTag={false} />
+      <ListingCover listing={listing} className="h-12 w-14 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1">
         <Link href={`/listings/${listing.id}`} className="block truncate text-sm font-semibold text-ink-900 hover:underline">{listing.title}</Link>
         <p className="flex flex-wrap items-center gap-x-2 text-xs text-ink-500">

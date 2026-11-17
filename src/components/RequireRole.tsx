@@ -16,7 +16,7 @@ export function RequireRole({ role, children }: { role: Role; children: (user: U
         <h1 className="text-xl font-semibold tracking-tight">Sign in to continue</h1>
         <p className="mt-2 text-ink-500">The {ROLE_LABEL[role].toLowerCase()} dashboard needs an account.</p>
         <div className="mt-6 grid grid-cols-2 gap-2">
-          <Link href="/signin" className="btn-secondary">Use a demo account</Link>
+          <Link href="/signin" className="btn-secondary">Use a test account</Link>
           <Link href="/signup" className="btn-primary">Sign up</Link>
         </div>
       </div>

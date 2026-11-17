@@ -19,7 +19,7 @@ export interface CheckStatus {
 function reviewWording(state: CheckState | undefined, noun: string, verb = "checked"): { status: string; tone: Tone } {
   switch (state) {
     case "demo_reviewed":
-      return { status: `${cap(verb)} — demo review only`, tone: "demo" };
+      return { status: `${cap(verb)} — sample review only`, tone: "demo" };
     case "submitted":
       return { status: `${cap(noun)} submitted · not yet ${verb}`, tone: "pending" };
     case "self_declared":
@@ -146,7 +146,7 @@ export function ListingChecksGrid({ listing, lister, agent }: { listing: Listing
       <p className="flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-900 ring-1 ring-red-200">
         <InfoIcon size={14} className="mt-0.5 shrink-0" />
         <span>
-          <b>Legal title: not verified.</b> IleLagos never checks land titles (C of O, Governor&apos;s consent, deeds). Use a property lawyer before paying anything. Demo data — no check above was actually carried out.
+          <b>Legal title: not verified.</b> IleLagos never checks land titles (C of O, Governor&apos;s consent, deeds). Use a property lawyer before paying anything. During the beta, no check above is actually carried out.
         </span>
       </p>
     </section>

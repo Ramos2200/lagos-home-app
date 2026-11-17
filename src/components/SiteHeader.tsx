@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { FEEDBACK_URL } from "@/lib/beta";
 import { ROLE_LABEL } from "@/lib/constants";
+import { useI18n, type MessageKey } from "@/lib/i18n";
+import { listerReminders, managedListings, reminderCount } from "@/lib/reminders";
 import { useStore } from "@/lib/store";
 import type { AppData, Role } from "@/lib/types";
 import { unreadFor } from "./InquiryBits";
+import { LanguageSelect } from "./LanguageSelect";
 
-const BANNER_KEY = "ilelagos-banner-dismissed";
+// New key for the beta banner, so people who hid the old prototype notice see it once.
+const BANNER_KEY = "ilelagos-beta-banner-dismissed";
 
 export function Logo() {
   return (
@@ -35,11 +40,20 @@ export function DemoBanner() {
   }, []);
   if (hidden) return null;
   return (
-    <div className="flex items-center justify-center gap-2 bg-brand-800 px-3 py-1 text-[11px] text-brand-50 sm:text-xs">
-      <span>Prototype · listings, people and checks are fictional</span>
+    <div className="flex items-center justify-center gap-x-3 gap-y-0.5 bg-brand-800 px-3 py-1.5 text-[11px] text-brand-50 sm:text-xs">
+      <span>
+        <b className="font-bold text-white">Beta</b> · the homes and people here are samples for testing
+      </span>
+      <Link
+        href={FEEDBACK_URL ?? "/feedback"}
+        {...(FEEDBACK_URL ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+        className="shrink-0 rounded-full bg-white px-2.5 py-0.5 font-bold text-brand-800 hover:bg-brand-50"
+      >
+        Give feedback
+      </Link>
       <button
         type="button"
-        aria-label="Hide prototype notice"
+        aria-label="Hide beta notice"
         className="rounded px-1 text-brand-100 hover:bg-brand-700"
         onClick={() => {
           setHidden(true);
@@ -55,10 +69,10 @@ export function DemoBanner() {
 }
 
 const LINKS = [
-  { href: "/search?mode=rent", label: "Rent", match: (p: string, m: string | null) => p === "/search" && m !== "sale" },
-  { href: "/search?mode=sale", label: "Buy", match: (p: string, m: string | null) => p === "/search" && m === "sale" },
-  { href: "/dashboard/owner", label: "List your home", match: (p: string) => p.startsWith("/dashboard/owner") },
-  { href: "/trust", label: "How checks work", match: (p: string) => p === "/trust" },
+  { href: "/search?mode=rent", label: "nav.rent" as MessageKey, match: (p: string, m: string | null) => p === "/search" && m !== "sale" },
+  { href: "/search?mode=sale", label: "nav.buy" as MessageKey, match: (p: string, m: string | null) => p === "/search" && m === "sale" },
+  { href: "/dashboard/owner", label: "nav.list" as MessageKey, match: (p: string) => p.startsWith("/dashboard/owner") },
+  { href: "/trust", label: "nav.checks" as MessageKey, match: (p: string) => p === "/trust" },
 ];
 
 const DASHBOARDS: Record<Role, { href: string; label: string }> = {
@@ -79,6 +93,7 @@ function NavLinksInner({ mobile, onNavigate, hideList }: { mobile?: boolean; onN
 }
 
 function NavLinkList({ pathname, mode, mobile, onNavigate, hideList }: { pathname: string; mode: string | null; mobile?: boolean; onNavigate?: () => void; hideList?: boolean }) {
+  const { t } = useI18n();
   return (
     <>
       {LINKS.filter((l) => !(hideList && l.href === "/dashboard/owner")).map((l) => {
@@ -95,7 +110,7 @@ function NavLinkList({ pathname, mode, mobile, onNavigate, hideList }: { pathnam
                 : `rounded-md px-3 py-2 text-[15px] font-semibold ${l.href === "/trust" ? "hidden lg:inline-block" : ""} ${active ? "text-brand-700 underline decoration-2 underline-offset-[22px]" : "text-ink-900 hover:text-brand-700"}`
             }
           >
-            {l.label}
+            {t(l.label)}
           </Link>
         );
       })}
@@ -114,12 +129,15 @@ function NavLinks(props: { mobile?: boolean; onNavigate?: () => void; hideList?:
 
 export function SiteHeader() {
   const { currentUser, ready, data } = useStore();
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   const dashLinks = currentUser ? [...dashboardsFor(currentUser.roles), ...(currentUser.isStaff ? [{ href: "/moderation", label: "Moderation" }] : [])] : [];
   const savedCount = ready ? data.savedListingIds.length : 0;
   const unread = ready && currentUser ? unreadTotal(data, currentUser.id) : 0;
+  // Things an owner or agent should do soon (availability checks, replies, viewings). In-app only.
+  const reminders = ready && currentUser ? reminderCount(listerReminders(managedListings(data, currentUser.id), data.inquiries, () => true)) : 0;
   const dashHref = dashboardsFor([currentUser?.activeRole ?? "seeker"])[0].href;
 
   return (
@@ -144,20 +162,21 @@ export function SiteHeader() {
 
         {/* Right: saved, messages, account */}
         <div className="flex items-center justify-end gap-1">
-          <HeaderIcon href="/saved" label="Saved homes" count={savedCount} active={pathname === "/saved"}>
+          <LanguageSelect compact className="hidden lg:block" />
+          <HeaderIcon href="/saved" label={t("nav.saved")} count={savedCount} active={pathname === "/saved"}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill={savedCount ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" aria-hidden className={savedCount ? "text-red-600" : ""}><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" /></svg>
           </HeaderIcon>
           {ready && currentUser && (
-            <HeaderIcon href="/messages" label="Messages" count={unread} active={pathname === "/messages"} urgent>
+            <HeaderIcon href="/messages" label={t("nav.messages")} count={unread} active={pathname === "/messages"} urgent>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" /></svg>
             </HeaderIcon>
           )}
           {ready && currentUser ? (
-            <AccountMenu name={currentUser.name} roleLabel={currentUser.isStaff ? "Demo staff" : ROLE_LABEL[currentUser.activeRole]} links={dashLinks} primaryHref={dashHref} />
+            <AccountMenu name={currentUser.name} roleLabel={currentUser.isStaff ? "Staff" : ROLE_LABEL[currentUser.activeRole]} links={dashLinks} primaryHref={dashHref} reminders={reminders} />
           ) : (
             <div className="hidden items-center gap-1 md:flex">
-              <Link href="/signin" className="btn-ghost btn-sm">Sign in</Link>
-              <Link href="/signup" className="btn-primary btn-sm">Join</Link>
+              <Link href="/signin" className="btn-ghost btn-sm">{t("nav.signin")}</Link>
+              <Link href="/signup" className="btn-primary btn-sm">{t("nav.join")}</Link>
             </div>
           )}
         </div>
@@ -180,16 +199,21 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <Link href="/messages" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-[15px] font-semibold text-ink-900 hover:bg-sand-200">
-                  Messages{unread > 0 ? ` (${unread} unread)` : ""}
+                  {t("nav.messages")}{unread > 0 ? ` (${unread})` : ""}
                 </Link>
                 <p className="mt-3 border-t border-sand-200 px-3 pt-3 pb-1 text-xs font-semibold tracking-wide text-ink-500 uppercase">Browse</p>
               </>
             )}
             <NavLinks mobile onNavigate={() => setOpen(false)} hideList={!!currentUser?.roles.includes("owner")} />
             <Link href="/saved" onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 text-[15px] font-medium text-ink-900 hover:bg-sand-200">
-              Saved homes{savedCount ? ` (${savedCount})` : ""}
+              {t("nav.saved")}{savedCount ? ` (${savedCount})` : ""}
             </Link>
           </nav>
+          <Link href="/install" onClick={() => setOpen(false)} className="mb-3 flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-3 text-[15px] font-semibold text-brand-800">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><rect x="6" y="2" width="12" height="20" rx="2" /><path d="M12 18h.01" /></svg>
+            Get the app
+          </Link>
+          <LanguageSelect className="mb-3 px-3" />
           {ready && currentUser ? (
             <Link href="/account" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl border border-sand-200 bg-white p-3">
               <Avatar name={currentUser.name} />
@@ -200,8 +224,8 @@ export function SiteHeader() {
             </Link>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              <Link href="/signin" onClick={() => setOpen(false)} className="btn-secondary">Sign in</Link>
-              <Link href="/signup" onClick={() => setOpen(false)} className="btn-primary">Get started</Link>
+              <Link href="/signin" onClick={() => setOpen(false)} className="btn-secondary">{t("nav.signin")}</Link>
+              <Link href="/signup" onClick={() => setOpen(false)} className="btn-primary">{t("nav.getStarted")}</Link>
             </div>
           )}
         </div>
@@ -260,7 +284,7 @@ function HeaderIcon({ href, label, count, active, urgent, children }: { href: st
 }
 
 /** Account button with a small menu of the person's dashboards and settings. */
-function AccountMenu({ name, roleLabel, links, primaryHref }: { name: string; roleLabel: string; links: { href: string; label: string }[]; primaryHref: string }) {
+function AccountMenu({ name, roleLabel, links, primaryHref, reminders }: { name: string; roleLabel: string; links: { href: string; label: string }[]; primaryHref: string; reminders: number }) {
   const { signOut } = useStore();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -283,18 +307,25 @@ function AccountMenu({ name, roleLabel, links, primaryHref }: { name: string; ro
       <button
         type="button"
         aria-haspopup="menu"
+        aria-label={`${name.split(" ")[0]}, account menu${reminders ? `, ${reminders} reminder${reminders === 1 ? "" : "s"}` : ""}`}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className="ml-1 flex items-center gap-2 rounded-full border border-sand-300 py-1 pr-2.5 pl-1 text-sm font-semibold text-ink-900 hover:border-ink-500"
       >
-        <Avatar name={name} />
+        <span className="relative">
+          <Avatar name={name} />
+          {reminders > 0 && <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-white bg-red-600" aria-hidden />}
+        </span>
         <span className="max-w-[8rem] truncate">{name.split(" ")[0]}</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {open && (
         <div role="menu" className="absolute right-0 z-40 mt-2 w-60 rounded-xl border border-sand-200 bg-white p-1.5 shadow-float">
           <p className="px-3 pt-2 pb-1 text-xs text-ink-500">Signed in as {roleLabel.toLowerCase()}</p>
-          <Link role="menuitem" href={primaryHref} className={`${item} font-semibold`} onClick={() => setOpen(false)}>Go to my dashboard</Link>
+          <Link role="menuitem" href={primaryHref} className={`${item} font-semibold`} onClick={() => setOpen(false)}>
+            Go to my dashboard
+            {reminders > 0 && <span className="ml-1.5 rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">{reminders} reminder{reminders === 1 ? "" : "s"}</span>}
+          </Link>
           {links.filter((l) => l.href !== primaryHref).map((l) => (
             <Link key={l.href} role="menuitem" href={l.href} className={item} onClick={() => setOpen(false)}>{l.label}</Link>
           ))}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useDialog } from "./useDialog";
 import { FREQUENCY_SHORT, naira } from "@/lib/format";
 import { locationLine } from "@/lib/listing-utils";
+import { useI18n } from "@/lib/i18n";
 import type { Listing } from "@/lib/types";
 
 export function WhatsAppIcon({ size = 18 }: { size?: number }) {
@@ -57,7 +58,7 @@ export function ContactPlaceholder({ kind, listing, name, onClose }: { kind: Kin
           <button className="btn-ghost !p-2" onClick={onClose} aria-label="Close">✕</button>
         </div>
         <p className="mt-2 rounded-lg bg-amber-50 p-2.5 text-xs text-amber-900">
-          Placeholder — this demo doesn&apos;t open WhatsApp, place calls or show real phone numbers.
+          WhatsApp and calls aren&apos;t switched on in the beta, and phone numbers stay hidden. Use Messages to talk to the lister.
         </p>
         {kind === "whatsapp" ? (
           <>
@@ -90,6 +91,7 @@ export function ContactPlaceholder({ kind, listing, name, onClose }: { kind: Kin
 
 /** Uses the phone's share sheet when available, otherwise copies the link. */
 export function ShareButton({ listing, className = "" }: { listing: Listing; className?: string }) {
+  const { t } = useI18n();
   const [done, setDone] = useState("");
   async function share() {
     // Always the listing page itself, so sharing from Saved homes (or a #section link) sends the right page.
@@ -108,7 +110,7 @@ export function ShareButton({ listing, className = "" }: { listing: Listing; cla
   }
   return (
     <button type="button" onClick={share} className={className} aria-label={done ? `${done}: ${listing.title}` : `Share ${listing.title}`}>
-      <ShareIcon size={16} /> {done || "Share"}
+      <ShareIcon size={16} /> {done || t("listing.share")}
     </button>
   );
 }

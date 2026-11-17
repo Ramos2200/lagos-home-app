@@ -83,3 +83,10 @@ export function uid(prefix: string): string {
 export function localDateOf(isoDateTime: string): string {
   return localISO(new Date(isoDateTime));
 }
+
+/** Sample data marks made-up estates and agencies "(fictional)"; the beta banner already says so, so hide it in names. */
+export function cleanName(s: string): string;
+export function cleanName(s: string | undefined): string | undefined;
+export function cleanName(s?: string) {
+  return s?.replace(/\s*\(fictional\)$/i, "");
+}

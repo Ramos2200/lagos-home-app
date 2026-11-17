@@ -7,14 +7,16 @@ import { setFlash } from "@/components/FlashNotice";
 import { ListingForm, listingFieldsFromValues, valuesFromListing } from "@/components/ListingForm";
 import { PageHeader } from "@/components/ui";
 import { todayISO } from "@/lib/format";
+import { usePhotoStore } from "@/lib/photos";
 import { useStore } from "@/lib/store";
 
 function EditListing() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { ready, data, currentUser, updateListing, setListingCheck } = useStore();
+  const { ready: photosReady, uploaded, savePhotos } = usePhotoStore();
 
-  if (!ready) return <div className="mx-auto max-w-3xl px-4 py-10"><div className="card h-40 animate-pulse bg-sand-50" /></div>;
+  if (!ready || !photosReady) return <div className="mx-auto max-w-3xl px-4 py-10"><div className="card h-40 animate-pulse bg-sand-50" /></div>;
 
   const listing = data.listings.find((l) => l.id === id);
   if (!listing) {
@@ -27,7 +29,7 @@ function EditListing() {
       <div className="mx-auto max-w-md px-4 py-16 text-center">
         <h1 className="text-xl font-semibold tracking-tight">You can&apos;t edit this listing</h1>
         <p className="mt-2 text-ink-500">Only the owner who listed it, or the agent managing it, can make changes.</p>
-        <Link href="/signin" className="btn-primary mt-6">Switch demo account</Link>
+        <Link href="/signin" className="btn-primary mt-6">Switch account</Link>
       </div>
     );
   }
@@ -39,7 +41,7 @@ function EditListing() {
       <ListingForm
         mode="edit"
         listedBy={isAgent ? "agent" : "owner"}
-        initial={valuesFromListing(listing)}
+        initial={{ ...valuesFromListing(listing), photos: uploaded(listing.id) }}
         originalPrice={listing.price}
         onCancel={() => router.push(back)}
         onSubmit={(v) => {
@@ -58,7 +60,8 @@ function EditListing() {
           if (isAgent && v.authorizationSubmitted && listing.checks.ownerAuthorization.state === "not_started") {
             setListingCheck(listing.id, "ownerAuthorization", { state: "submitted", date: todayISO() });
           }
-          setFlash(`Changes to “${fields.title}” are saved.`);
+          const photoError = savePhotos(listing.id, v.photos);
+          setFlash(photoError ? `Changes to “${fields.title}” are saved, but the photos weren't: ${photoError}` : `Changes to “${fields.title}” are saved.`);
           router.push(back);
         }}
       />

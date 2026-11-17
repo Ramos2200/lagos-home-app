@@ -51,10 +51,10 @@ export function OccupancyBadge({ occupancy }: { occupancy: Occupancy }) {
   return <Badge tone="blue">{OCCUPANCY_LABEL[occupancy]}</Badge>;
 }
 
-export function DemoBadge() {
+export function DemoBadge({ label = "Sample listing" }: { label?: string }) {
   return (
     <Badge tone="amber" className="!font-medium">
-      Demo
+      {label}
     </Badge>
   );
 }

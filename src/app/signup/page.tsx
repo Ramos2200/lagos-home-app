@@ -146,20 +146,20 @@ export default function SignupPage() {
           {errors.role && <p id="role-error" className="mt-3 text-sm font-medium text-red-700" role="alert"><span aria-hidden className="mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-700 align-[-2px] text-[10px] font-bold text-white">!</span>{errors.role}</p>}
           <button type="submit" className="btn-primary mt-6 w-full">Continue</button>
           <p className="mt-5 text-center text-sm text-ink-500">
-            Already have an account, or just exploring? <Link href="/signin" className="link">Sign in or use a demo account</Link>
+            Already have an account, or just exploring? <Link href="/signin" className="link">Sign in or use a test account</Link>
           </p>
         </form>
       )}
 
       {step === "details" && (
         <form onSubmit={createAccount} noValidate className="space-y-4">
-          <Heading hRef={headingRef} sub="Just the basics. This creates a demo account saved only in this browser — please use test details.">
+          <Heading hRef={headingRef} sub="Just the basics. During the beta, your account is saved only in this browser — please use test details.">
             {created ? "Your details" : "Create your account"}
           </Heading>
           <FormField id="name" label="Your name" error={errors.name}>
             <input id="name" className="field" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" aria-invalid={!!errors.name || undefined} aria-describedby={errors.name ? "name-error" : undefined} />
           </FormField>
-          <FormField id="email" label="Email address" error={errors.email} hint="We'll use this to send you viewing updates (not in this demo).">
+          <FormField id="email" label="Email address" error={errors.email} hint="Viewing updates are shown inside the app for now.">
             <input
               id="email"
               type="email"
@@ -182,7 +182,7 @@ export default function SignupPage() {
             </FormField>
           )}
           <p className="rounded-xl bg-sand-200/60 p-3 text-xs text-ink-700">
-            We never ask for ID documents, BVN, NIN or bank details in this prototype.
+            We never ask for ID documents, BVN, NIN or bank details.
           </p>
           <button type="submit" className="btn-primary w-full">{created ? "Continue" : "Create account"}</button>
         </form>
@@ -300,7 +300,7 @@ export default function SignupPage() {
           <NextSteps
             items={[
               "Only list homes you're authorized to represent. You'll confirm this for each listing.",
-              "Your identity and agent licence are separate checks — you can start them (as a demo) from your profile.",
+              "Your identity and agent licence are separate checks — you can start them from your profile.",
               "Inquiries for all your listings appear in one place in your dashboard.",
             ]}
           />

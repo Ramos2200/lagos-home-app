@@ -11,7 +11,7 @@ import type { Inquiry, Listing, ListingStatus } from "@/lib/types";
 import { Badge, OccupancyBadge, StatusBadge } from "./Badges";
 import { CheckIcon } from "./Icons";
 import { DemoActivity } from "./DashboardParts";
-import { ListingPhoto } from "./ListingPhoto";
+import { ListingCover } from "./ListingCover";
 import { EmptyState } from "./ui";
 import { ListingCheckList } from "./ListingChecks";
 import { ContactLine, unreadFor, whenText } from "./InquiryBits";
@@ -95,7 +95,7 @@ export function ManageListingRow({
     <li className="card overflow-hidden">
       <div className="flex gap-3 p-3 sm:p-4">
         <Link href={`/listings/${listing.id}`} className="shrink-0" tabIndex={-1} aria-hidden>
-          <ListingPhoto seed={listing.photoSeed} type={listing.propertyType} className="h-20 w-24 rounded-lg sm:h-24 sm:w-32" showTag={false} />
+          <ListingCover listing={listing} className="h-20 w-24 rounded-lg sm:h-24 sm:w-32" />
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
@@ -140,7 +140,7 @@ export function ManageListingRow({
         </div>
         {openReports > 0 && (
           <p className="font-medium text-red-800 sm:col-span-2">
-            {openReports} open {openReports === 1 ? "report" : "reports"} from visitors — IleLagos demo staff are reviewing {openReports === 1 ? "it" : "them"}.
+            {openReports} open {openReports === 1 ? "report" : "reports"} from visitors — IleLagos staff are reviewing {openReports === 1 ? "it" : "them"}.
           </p>
         )}
       </div>
@@ -203,7 +203,7 @@ export function ManageListingRow({
                   onClick={() => {
                     setListingCheck(listing.id, "documentReview", { state: "submitted", date: todayISO() });
                     close();
-                    notify("Document review requested (demo placeholder — nothing uploaded).");
+                    notify("Document review requested (nothing is uploaded during the beta).");
                   }}
                 >
                   Request document review
@@ -214,7 +214,7 @@ export function ManageListingRow({
                   onClick={() => {
                     setListingCheck(listing.id, "ownerAuthorization", { state: "submitted", date: todayISO() });
                     close();
-                    notify("Owner authorization marked as submitted (demo — no document uploaded).");
+                    notify("Owner authorization marked as submitted (no document is uploaded during the beta).");
                   }}
                 >
                   Mark owner authorization submitted

@@ -114,7 +114,7 @@ export function InquiryDialog({
             <p className="mt-1 text-sm text-ink-500">
               {type === "viewing" ? "The lister can accept it or suggest another time." : "The lister can reply in the app."}{" "}
               {share ? "You chose to share your contact details." : "Your contact details stay private."}
-              {type === "viewing" && withProfile ? ` Your ${listing.purpose === "sale" ? "buyer" : "renter"} profile was included.` : ""} Demo only — nothing is sent outside IleLagos.
+              {type === "viewing" && withProfile ? ` Your ${listing.purpose === "sale" ? "buyer" : "renter"} profile was included.` : ""} Nothing is sent outside IleLagos.
             </p>
             <div className="mt-5 grid gap-2">
               {currentUser ? (

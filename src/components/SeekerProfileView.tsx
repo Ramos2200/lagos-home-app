@@ -32,7 +32,7 @@ export function SeekerProfileView({ profile: p, purpose, byYou = false, classNam
           </div>
         ))}
       </dl>
-      <p className="mt-2 text-[11px] text-ink-500">Self-reported and not checked. Demo only.</p>
+      <p className="mt-2 text-[11px] text-ink-500">Self-reported and not checked.</p>
     </div>
   );
 }

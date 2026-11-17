@@ -94,7 +94,7 @@ export function AreaGuideView() {
             )}
             <p className="mt-4 flex gap-2 rounded-xl bg-sand-50 p-3 text-xs text-ink-700 ring-1 ring-sand-200">
               <InfoIcon className="mt-0.5 shrink-0" size={14} />
-              These are asking prices from a handful of demo listings, not rents actually paid or sale prices. Real prices vary a lot by street, building and condition.
+              These are asking prices from a handful of listings, not rents actually paid or sale prices. Real prices vary a lot by street, building and condition.
             </p>
           </section>
 
@@ -112,7 +112,7 @@ export function AreaGuideView() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-xs text-ink-500">General notes written for this demo, not local research. Always visit and ask neighbours before deciding.</p>
+              <p className="mt-4 text-xs text-ink-500">General notes, not local research. Always visit and ask neighbours before deciding.</p>
               <TravelGuide area={single} />
             </section>
           )}
@@ -151,7 +151,7 @@ export function AreaGuideView() {
                     <Avatar name={a.name} size={36} />
                     <div className="min-w-0 text-sm">
                       <Link href={`/agents/${a.id}`} className="font-semibold text-ink-900 hover:underline">{a.name}</Link>
-                      <p className="truncate text-xs text-ink-500">{agencyLabel(a)} · demo</p>
+                      <p className="truncate text-xs text-ink-500">{agencyLabel(a)}</p>
                     </div>
                   </li>
                 ))}

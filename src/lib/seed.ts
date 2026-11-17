@@ -64,7 +64,7 @@ function users(): User[] {
     },
     {
       id: "u-staff-demo",
-      name: "Demo Moderator",
+      name: "IleLagos Moderator",
       email: "moderator.demo@example.com",
       roles: ["seeker"],
       activeRole: "seeker",
@@ -75,7 +75,7 @@ function users(): User[] {
     },
     {
       id: "u-seeker-demo",
-      name: "Demo Home Seeker",
+      name: "Test Home Seeker",
       email: "seeker.demo@example.com",
       roles: ["seeker"],
       activeRole: "seeker",
@@ -621,7 +621,7 @@ function inquiries(): Inquiry[] {
       listingId: "lst-chevron-3bed-sale",
       type: "message",
       name: "Ibrahim S.",
-      contact: "0800 000 0000 (demo)",
+      contact: "0800 000 0000 (sample)",
       message: "Can you share the service charge breakdown?",
       status: "responded",
       createdAt: daysAgoISO(4),

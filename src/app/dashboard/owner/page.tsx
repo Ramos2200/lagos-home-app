@@ -6,11 +6,13 @@ import { AvailabilityCheckItem, InquiryItem, RowList, isCheckDue, isCheckSoon, i
 import { FlashNotice } from "@/components/FlashNotice";
 import { GettingStarted } from "@/components/GettingStarted";
 import { InquiryList, ManageListingRow } from "@/components/ManageListing";
+import { RemindersPanel } from "@/components/Reminders";
 import { RequireRole } from "@/components/RequireRole";
 import { StatusGuide } from "@/components/StatusGuide";
 import { FutureIntegrations } from "@/components/TrustPanel";
 import { EmptyState, StatStrip } from "@/components/ui";
 import { todayISO } from "@/lib/format";
+import { agencyLabel } from "@/lib/agents";
 import { useStore } from "@/lib/store";
 import type { Listing, User } from "@/lib/types";
 
@@ -87,30 +89,20 @@ function OwnerDashboard({ user }: { user: User }) {
             />
           ) : (
             <>
-              <Panel
-                title="Needs your attention"
-                description="Reply to people and keep availability up to date — renters trust listings that were confirmed recently."
-              >
-                {due.length === 0 && needReply.length === 0 ? (
-                  <EmptyState title="You're all caught up" body="No replies or availability checks are waiting." />
-                ) : (
-                  <div className="space-y-4">
-                    {due.length > 0 && (
-                      <RowList label="Availability checks due">
-                        {due.map((l) => <AvailabilityCheckItem key={l.id} listing={l} />)}
-                      </RowList>
-                    )}
-                    {needReply.length > 0 && (
-                      <RowList label="Inquiries waiting for a reply">
-                        {needReply.slice(0, 3).map((i) => <InquiryItem key={i.id} inquiry={i} listings={data.listings} />)}
-                      </RowList>
-                    )}
+              <RemindersPanel listings={mine} />
+
+              {needReply.length > 0 && (
+                <Panel title="Inquiries waiting for a reply" description="Renters trust listers who reply quickly.">
+                  <div className="space-y-3">
+                    <RowList label="Inquiries waiting for a reply">
+                      {needReply.slice(0, 3).map((i) => <InquiryItem key={i.id} inquiry={i} listings={data.listings} />)}
+                    </RowList>
                     {needReply.length > 3 && (
                       <button className="link text-sm" onClick={() => go("inquiries")}>See all {needReply.length} inquiries</button>
                     )}
                   </div>
-                )}
-              </Panel>
+                </Panel>
+              )}
 
               <Panel title="Your listings at a glance" action={<button className="link text-sm" onClick={() => go("listings")}>Manage listings</button>}>
                 <dl className="grid gap-px overflow-hidden rounded-2xl border border-sand-200 bg-sand-200 shadow-card sm:grid-cols-3">
@@ -128,10 +120,10 @@ function OwnerDashboard({ user }: { user: User }) {
               { label: "Add your first listing", done: mine.length > 0, href: "/dashboard/listings/new?as=owner", cta: "Start" },
               { label: "Keep availability confirmed (every 30 days)", done: mine.length > 0 && due.length === 0, action: () => go("checks"), cta: "Review" },
               {
-                label: "Start your identity check (demo)",
+                label: "Start your identity check",
                 done: user.checks.identity.state !== "not_started",
                 action: () => setUserCheck("identity", { state: "submitted", date: todayISO() }),
-                cta: "Simulate",
+                cta: "Start",
               },
               { label: "Reply to new inquiries", done: needReply.length === 0, action: () => go("inquiries"), cta: "Open" },
             ]}
@@ -171,7 +163,7 @@ function OwnerDashboard({ user }: { user: User }) {
                       key={l.id}
                       listing={l}
                       inquiryCount={0}
-                      readOnlyReason={`Managed by ${agent?.name ?? "an agent"}${agent?.agencyName ? `, ${agent.agencyName}` : ""}.`}
+                      readOnlyReason={`Managed by ${agent?.name ?? "an agent"}${agent?.agencyName ? `, ${agencyLabel(agent)}` : ""}.`}
                     />
                   );
                 })}

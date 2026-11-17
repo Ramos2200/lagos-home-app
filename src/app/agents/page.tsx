@@ -18,7 +18,7 @@ export default function AgentsPage() {
       <PageHeader
         eyebrow="Agents"
         title="Agents on IleLagos"
-        description="Fictional demo agents. See where each one works, what they have listed and which checks they've started."
+        description="See where each agent works, what they have listed and which checks they've started."
       />
       {agents.length === 0 ? (
         <div className="mt-8"><EmptyState title="No agents yet" body="Agents appear here when they sign up and list a home." /></div>
@@ -32,7 +32,7 @@ export default function AgentsPage() {
                   <Link href={`/agents/${a.id}`} className="font-bold text-ink-900 after:absolute after:inset-0 after:content-[''] hover:underline">
                     {a.name}
                   </Link>
-                  <p className="truncate text-sm text-ink-500">{agencyLabel(a)} · demo</p>
+                  <p className="truncate text-sm text-ink-500">{agencyLabel(a)}</p>
                 </div>
               </div>
               <p className="text-sm text-ink-700">
