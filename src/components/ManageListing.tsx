@@ -1,5 +1,6 @@
 "use client";
 
+import { SeekerProfileView } from "./SeekerProfileView";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { INQUIRY_STATUS_LABEL, INQUIRY_STATUS_TONE, STALE_AFTER_DAYS, STATUS_OPTIONS, statusLabel } from "@/lib/constants";
@@ -403,6 +404,7 @@ function InquiryCard({ inquiry: i, listing: l }: { inquiry: Inquiry; listing?: L
           </div>
         )}
       </dl>
+      <SeekerProfileView profile={i.profile} purpose={l?.purpose} className="mt-3" />
       {last && <p className="mt-3 line-clamp-2 rounded-lg bg-sand-50 p-3 text-sm text-ink-700 ring-1 ring-sand-200">{last.from === "lister" ? "You: " : ""}“{last.text}”</p>}
 
       <div className="mt-4 flex flex-wrap gap-2">

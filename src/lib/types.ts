@@ -95,6 +95,8 @@ export interface Listing {
   availableFrom: string;
   lastConfirmed: string;
   description: string;
+  /** Link to a video tour hosted elsewhere (YouTube, Instagram…). Opened in a new tab, never embedded. */
+  videoUrl?: string;
   ownerId: string;
   ownerDisplayName?: string; // for agent-managed listings where owner has no account
   agentId?: string;
@@ -131,9 +133,25 @@ export interface User {
   isDemo: boolean;
   /** What a home seeker told us during onboarding. */
   preferences?: SeekerPreferences;
+  /** Saved so it can be reused on the next viewing request. Only shared when the person chooses to. */
+  seekerProfile?: SeekerProfile;
   checklistDismissed?: boolean;
   /** Demo staff account that can use the moderation queue. Not a real staff login. */
   isStaff?: boolean;
+}
+
+export type Occupation = "employed" | "self_employed" | "student" | "retired" | "other";
+
+/**
+ * A renter's or buyer's short profile, optionally sent with a viewing request.
+ * Demo only: no ID numbers, bank details, salary slips or documents — just what helps a lister plan.
+ */
+export interface SeekerProfile {
+  /** Budget in naira: per year for renting, total for buying. */
+  budget?: number;
+  moveInDate?: string; // yyyy-mm-dd
+  householdSize?: number;
+  occupation?: Occupation;
 }
 
 export interface SeekerPreferences {
@@ -188,6 +206,8 @@ export interface Inquiry {
   status: InquiryStatus;
   createdAt: string;
   messages?: ChatMessage[];
+  /** The renter or buyer profile they chose to send with a viewing request. */
+  profile?: SeekerProfile;
   seekerReadAt?: string;
   listerReadAt?: string;
 }

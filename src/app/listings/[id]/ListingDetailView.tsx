@@ -21,7 +21,7 @@ import { NEARBY } from "@/lib/areas";
 import { TravelGuide } from "@/components/TravelGuide";
 import { AMENITY_LABEL, OCCUPANCY_LABEL, PROPERTY_TYPE_LABEL, STALE_AFTER_DAYS } from "@/lib/constants";
 import { daysSince, formatDate, naira, nairaCompact, relativeDays } from "@/lib/format";
-import { availabilityInfo, daysListedLabel, feeParts, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
+import { availabilityInfo, daysListedLabel, feeParts, isVideoLink, linkHost, isPubliclySearchable, moveInTotal, similarListings } from "@/lib/listing-utils";
 import { useStore } from "@/lib/store";
 import type { InquiryType, Listing } from "@/lib/types";
 
@@ -119,9 +119,16 @@ export function ListingDetailView() {
         <Gallery
           listing={listing}
           overlay={
-            <span className="inline-flex items-center rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink-900 shadow-card">
-              {listing.purpose === "rent" ? "For rent" : "For sale"}
-            </span>
+            <>
+              <span className="inline-flex items-center rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-ink-900 shadow-card">
+                {listing.purpose === "rent" ? "For rent" : "For sale"}
+              </span>
+              {listing.videoUrl && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-ink-900 px-2.5 py-1 text-xs font-semibold text-white shadow-card">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M8 5v14l11-7z" /></svg> Video tour
+                </span>
+              )}
+            </>
           }
         />
       </div>
@@ -274,6 +281,40 @@ export function ListingDetailView() {
             <section className="p-5 sm:p-6">
               <h2 className="section-title">About this home</h2>
               <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-ink-700">{listing.description}</p>
+            </section>
+
+            <section id="video" className="scroll-mt-20 p-5 sm:p-6" aria-labelledby="video-title">
+              <h2 id="video-title" className="section-title">Video tour</h2>
+              {listing.videoUrl && isVideoLink(listing.videoUrl) ? (
+                <div className="mt-3 flex flex-wrap items-center gap-4 rounded-xl bg-ink-900 p-4 text-white">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold">Walk-through video from the {agent ? "agent" : "owner"}</p>
+                    <p className="text-xs text-white/70">Opens on {linkHost(listing.videoUrl)} in a new tab. IleLagos hasn&apos;t checked this video.</p>
+                  </div>
+                  <a href={listing.videoUrl} target="_blank" rel="noopener noreferrer nofollow" className="btn-sm inline-flex items-center rounded-lg bg-white px-4 font-bold text-ink-900 hover:bg-sand-100">
+                    Watch video<span className="sr-only"> (opens {linkHost(listing.videoUrl)} in a new tab)</span>
+                  </a>
+                </div>
+              ) : (
+                <div className="mt-3 flex items-center gap-4 rounded-xl border border-dashed border-sand-300 bg-sand-50 p-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-sand-200 text-ink-500" aria-hidden>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+                  </span>
+                  <div className="text-sm">
+                    <p className="font-semibold text-ink-900">No video tour yet</p>
+                    <p className="text-ink-500">
+                      {isMine ? (
+                        <>Add a link to a walk-through video when you <Link href={`/dashboard/listings/${listing.id}/edit`} className="link">edit this listing</Link>.</>
+                      ) : (
+                        "You can ask the lister for a video or a video call before visiting."
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
             </section>
 
             <section aria-labelledby="loc-title">

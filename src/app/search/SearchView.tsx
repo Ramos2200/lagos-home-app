@@ -18,6 +18,14 @@ import { useStore } from "@/lib/store";
 import type { Purpose } from "@/lib/types";
 
 const VIEW_KEY = "ilelagos-results-view";
+/** Desktop only: whether the map panel is shown beside the results (a per-browser preference). */
+const MAP_KEY = "ilelagos-show-map";
+
+/** "Yaba, Surulere, Ilupeju, Maryland" from "Search this area" reads better as "Map area (4 areas)". */
+function queryLabel(q: string): string {
+  const parts = q.split(",").map((p) => p.trim()).filter(Boolean);
+  return parts.length > 2 ? `Map area (${parts.length} areas)` : q;
+}
 
 export function budgetLabel(f: Pick<SearchFilters, "mode" | "min" | "max">): string | null {
   if (!f.min && !f.max) return null;
@@ -50,6 +58,7 @@ export function SearchView() {
   const [savedMsg, setSavedMsg] = useState("");
   const [mapOpen, setMapOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(true);
 
   useEffect(() => {
     // keep the text box in sync when navigating with back/forward
@@ -65,7 +74,23 @@ export function SearchView() {
     // Phones default to the compact list; larger screens to the grid.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setView(v === "grid" || v === "list" ? v : window.innerWidth < 640 ? "list" : "grid");
+    let m: string | null = null;
+    try {
+      m = localStorage.getItem(MAP_KEY);
+    } catch {}
+    if (m === "0") setShowMap(false);
   }, []);
+
+  const toggleMap = () => {
+    setShowMap((s) => {
+      try {
+        localStorage.setItem(MAP_KEY, s ? "0" : "1");
+      } catch {}
+      return !s;
+    });
+  };
+  const searchArea = (areas: string[]) => apply({ q: areas.join(", ") });
+  const mapKey = filtersToQuery(filters);
 
   const chooseView = (v: "list" | "grid") => {
     setView(v);
@@ -88,7 +113,7 @@ export function SearchView() {
 
   // Active filter chips, each with its own remove action.
   const chips: { key: string; label: string; remove: Partial<SearchFilters> }[] = [];
-  if (filters.q) chips.push({ key: "q", label: `“${filters.q}”`, remove: { q: "" } });
+  if (filters.q) chips.push({ key: "q", label: filters.q.split(",").length > 2 ? queryLabel(filters.q) : `“${filters.q}”`, remove: { q: "" } });
   for (const t of filters.types) chips.push({ key: `t-${t}`, label: PROPERTY_TYPE_LABEL[t as keyof typeof PROPERTY_TYPE_LABEL] ?? t, remove: { types: filters.types.filter((x) => x !== t) } });
   const b = budgetLabel(filters);
   if (b) chips.push({ key: "budget", label: b, remove: { min: undefined, max: undefined } });
@@ -148,7 +173,7 @@ export function SearchView() {
         )}
       </div>
     ) : (
-      <div className={view === "list" ? "grid gap-3" : "grid gap-4 sm:grid-cols-2"}>
+      <div className={view === "list" ? `grid gap-3 ${showMap ? "" : "lg:grid-cols-2"}` : `grid gap-4 sm:grid-cols-2 ${showMap ? "" : "lg:grid-cols-3 xl:grid-cols-4"}`}>
         {results.map((l) => (
           <div
             key={l.id}
@@ -234,20 +259,22 @@ export function SearchView() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1600px] lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,1.05fr)]">
-        {/* Desktop: map on the left, always in view */}
-        <div className="hidden lg:block">
-          <div className="sticky top-[125px] h-[calc(100vh-125px)] border-r border-sand-200">
-            <SearchMap listings={results} activeId={activeId} onActive={setActiveId} className="h-full w-full" />
+      <div className={`mx-auto max-w-[1600px] ${showMap ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(560px,1.05fr)]" : ""}`}>
+        {/* Desktop: map on the left, always in view (can be hidden for a wider list) */}
+        {showMap && (
+          <div className="hidden lg:block">
+            <div className="sticky top-[125px] h-[calc(100vh-125px)] border-r border-sand-200">
+              <SearchMap key={mapKey} listings={results} activeId={activeId} onActive={setActiveId} onSearchArea={searchArea} className="h-full w-full" />
+            </div>
           </div>
-        </div>
+        )}
 
         <section className="px-4 py-5 lg:px-6">
           <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
             <div className="min-w-0">
               <h1 className="text-[22px] leading-tight font-extrabold tracking-tight text-ink-900 sm:text-[26px]">
                 {filters.mode === "rent" ? "Lagos homes for rent" : "Lagos homes for sale"}
-                {filters.q ? ` · ${filters.q}` : ""}
+                {filters.q ? ` · ${queryLabel(filters.q)}` : ""}
               </h1>
               <p className="muted mt-0.5">
                 <b className="font-bold text-ink-900">{ready ? results.length : "…"}</b> {results.length === 1 ? "result" : "results"}
@@ -273,6 +300,15 @@ export function SearchView() {
                   <option value="size_desc">Largest (m²)</option>
                 </select>
               </label>
+              <button
+                type="button"
+                onClick={toggleMap}
+                aria-pressed={showMap}
+                className="hidden items-center gap-1.5 rounded-lg border border-sand-200 px-2.5 py-1.5 text-sm font-semibold text-ink-700 hover:border-ink-900 lg:inline-flex"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" /></svg>
+                {showMap ? "Hide map" : "Show map"}
+              </button>
               <div className="inline-flex rounded-lg bg-sand-100 p-0.5" role="group" aria-label="Result layout">
                 {(["grid", "list"] as const).map((v) => (
                   <button
@@ -341,7 +377,7 @@ export function SearchView() {
             <p className="font-bold">{results.length} {results.length === 1 ? "home" : "homes"} on the map</p>
             <button type="button" className="btn-secondary btn-sm" onClick={() => setMapOpen(false)} autoFocus>Show list</button>
           </div>
-          <SearchMap listings={results} activeId={activeId} onActive={setActiveId} className="flex-1" />
+          <SearchMap key={mapKey} listings={results} activeId={activeId} onActive={setActiveId} onSearchArea={searchArea} className="flex-1" />
         </div>
       )}
 

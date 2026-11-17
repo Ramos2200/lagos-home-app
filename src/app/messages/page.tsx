@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SeekerProfileView } from "@/components/SeekerProfileView";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/Badges";
 import { unreadFor, whenText } from "@/components/InquiryBits";
@@ -194,6 +195,7 @@ function ThreadView({ thread, user, onBack }: { thread: Thread; user: User; onBa
               {side === "lister" ? ` — waiting for ${other.split(" ")[0]}` : ""}
             </p>
           )}
+          <SeekerProfileView profile={i.profile} purpose={l?.purpose} byYou={side === "seeker"} className="mt-3" />
           <div className="mt-3 flex flex-wrap gap-2">
             {side === "lister" && i.status === "new" && (
               <>

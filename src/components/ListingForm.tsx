@@ -4,7 +4,7 @@ import { cloneElement, isValidElement, useEffect, useRef, useState } from "react
 import { AMENITIES, AMENITY_LABEL, LAGOS_AREAS, OCCUPANCY_LABEL, PROPERTY_TYPES, PROPERTY_TYPE_LABEL, STATUS_OPTIONS, statusLabel } from "@/lib/constants";
 import { FREQUENCY_LABEL, formatDate, naira, todayISO } from "@/lib/format";
 import type { Listing, ListingStatus, Occupancy, OtherCost, PropertyType, Purpose, RentFrequency } from "@/lib/types";
-import { costBreakdown } from "@/lib/listing-utils";
+import { costBreakdown, isVideoLink } from "@/lib/listing-utils";
 import { CostBreakdownView } from "./CostBreakdownView";
 import { CheckIcon } from "./Icons";
 import { MoneyField } from "./MoneyField";
@@ -41,6 +41,7 @@ export interface ListingFormValues {
   occupancy: Occupancy;
   availableFrom: string;
   description: string;
+  videoUrl: string;
   ownerDisplayName: string;
   priceNote: string;
   ownershipConfirmed: boolean;
@@ -81,6 +82,7 @@ export function valuesFromListing(l?: Listing): ListingFormValues {
     occupancy: l?.occupancy ?? "vacant",
     availableFrom: l?.availableFrom ?? todayISO(),
     description: l?.description ?? "",
+    videoUrl: l?.videoUrl ?? "",
     ownerDisplayName: l?.ownerDisplayName ?? "",
     priceNote: "",
     ownershipConfirmed: !!l,
@@ -126,6 +128,7 @@ export function listingFieldsFromValues(v: ListingFormValues) {
     occupancy: v.occupancy,
     availableFrom: v.availableFrom,
     description: v.description.trim(),
+    videoUrl: v.videoUrl.trim() || undefined,
     ownerDisplayName: v.ownerDisplayName.trim() || undefined,
   };
 }
@@ -229,6 +232,7 @@ export function ListingForm({
       e.price = v.purpose === "rent" ? "Enter the rent in naira, for example 2,500,000." : "Enter the asking price in naira, for example 95,000,000.";
     }
     if (i === 2 && !v.availableFrom) e.avail = "Choose the date the home is available from.";
+    if (i === 2 && v.videoUrl.trim() && !isVideoLink(v.videoUrl)) e.video = "Enter a full link starting with https:// (for example a YouTube or Instagram video), or leave it empty.";
     if (i === 3) {
       if (mode === "create" && listedBy === "owner" && !v.ownershipConfirmed) e.ownership = "Tick the box to confirm you own this home or are entitled to list it.";
       if (listedBy === "agent" && !v.ownerDisplayName.trim()) e.owner = "Add the owner's name as it should appear, or write “Private owner”.";
@@ -574,6 +578,9 @@ export function ListingForm({
             <Section title="Description & photos">
               <Field label="Description" id="desc">
                 <textarea id="desc" rows={4} className="field" value={v.description} onChange={(e) => set("description", e.target.value)} />
+              </Field>
+              <Field label="Video tour link" id="video" optional error={errors.video} hint="Paste a link to a walk-through video you've already posted, e.g. on YouTube or Instagram. It opens on that site.">
+                <input id="video" type="url" inputMode="url" className="field" value={v.videoUrl} onChange={(e) => set("videoUrl", e.target.value)} placeholder="https://" />
               </Field>
               <div className="rounded-xl border border-dashed border-sand-300 bg-sand-50 p-4 text-center text-sm text-ink-500">
                 Photo upload placeholder — this prototype shows illustrated demo images instead of uploading files.

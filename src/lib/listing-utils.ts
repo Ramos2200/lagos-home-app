@@ -363,3 +363,22 @@ export function daysListedLabel(l: Listing): string {
   return d === 0 ? "today" : `${d} day${d === 1 ? "" : "s"} ago`;
 }
 
+
+/** A video tour link must be a full https:// address. */
+export function isVideoLink(url: string): boolean {
+  try {
+    const u = new URL(url.trim());
+    return u.protocol === "https:" && u.hostname.includes(".");
+  } catch {
+    return false;
+  }
+}
+
+/** "youtube.com" from "https://www.youtube.com/watch?v=…", for showing where a link goes. */
+export function linkHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}

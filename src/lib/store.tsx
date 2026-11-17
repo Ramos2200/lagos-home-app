@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { formatDate, todayISO, uid } from "./format";
 import { DATA_VERSION, SEED_LOCAL_NOTES, createSeedData } from "./seed";
-import type { AppData, Inquiry, InquiryStatus, Listing, ListingReport, ListingStatus, ReportStatus, Role, SavedSearch, SeekerPreferences, TrustCheck, User } from "./types";
+import type { AppData, Inquiry, InquiryStatus, Listing, ListingReport, ListingStatus, ReportStatus, Role, SavedSearch, SeekerPreferences, SeekerProfile, TrustCheck, User } from "./types";
 
 const STORAGE_KEY = "lagos-homes-demo-v1";
 
@@ -57,6 +57,8 @@ interface StoreApi {
   /** Private note on a saved home; an empty note removes it. */
   setSavedNote: (listingId: string, note: string) => void;
   setPreferences: (p: SeekerPreferences) => void;
+  /** Saves the signed-in person's renter/buyer profile for reuse on viewing requests. */
+  saveSeekerProfile: (p: SeekerProfile) => void;
   dismissChecklist: () => void;
   saveSearch: (label: string, query: string) => SavedSearch;
   deleteSearch: (id: string) => void;
@@ -385,6 +387,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return { ...d, savedNotes };
       }),
     setPreferences: (p) => mutateUser((u) => ({ ...u, preferences: p })),
+    saveSeekerProfile: (p) => mutateUser((u) => ({ ...u, seekerProfile: p })),
     dismissChecklist: () => mutateUser((u) => ({ ...u, checklistDismissed: true })),
     saveSearch: (label, query) => {
       const s: SavedSearch = { id: uid("ss"), userId: data.currentUserId, label, query, createdAt: todayISO(), lastSeenAt: new Date().toISOString() };

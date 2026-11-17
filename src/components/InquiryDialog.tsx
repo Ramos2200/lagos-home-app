@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { daysFromNowISO, todayISO } from "@/lib/format";
 import { useStore } from "@/lib/store";
-import type { InquiryType, Listing } from "@/lib/types";
+import type { InquiryType, Listing, Occupation, SeekerProfile } from "@/lib/types";
 import { CheckIcon } from "./Icons";
+import { MoneyField } from "./MoneyField";
+import { OCCUPATION_LABEL, hasProfile } from "./SeekerProfileView";
 import { useDialog } from "./useDialog";
 
-type Errors = { name?: string; contact?: string; when?: string; message?: string };
+type Errors = { name?: string; contact?: string; when?: string; message?: string; profile?: string };
 
 const MAX_MESSAGE = 300;
 
@@ -21,7 +23,15 @@ export function InquiryDialog({
   type: InquiryType;
   onClose: () => void;
 }) {
-  const { currentUser, addInquiry } = useStore();
+  const { currentUser, addInquiry, saveSeekerProfile } = useStore();
+  // Optional renter/buyer profile (viewings only). Pre-filled from the saved one; off unless they've shared one before.
+  const savedProfile = currentUser?.seekerProfile;
+  const [withProfile, setWithProfile] = useState(hasProfile(savedProfile));
+  const [budget, setBudget] = useState(savedProfile?.budget ? String(savedProfile.budget) : "");
+  const [moveIn, setMoveIn] = useState(savedProfile?.moveInDate ?? "");
+  const [household, setHousehold] = useState(savedProfile?.householdSize ? String(savedProfile.householdSize) : "");
+  const [occupation, setOccupation] = useState<Occupation | "">(savedProfile?.occupation ?? "");
+  const [remember, setRemember] = useState(true);
   const [name, setName] = useState(currentUser?.name ?? "");
   const [share, setShare] = useState(false);
   const [contact, setContact] = useState(currentUser?.email ?? "");
@@ -44,14 +54,28 @@ export function InquiryDialog({
       if (!date && !time) next.when = "Choose a date, a time of day, or both.";
       else if (date && date < todayISO()) next.when = "Choose today or a later date.";
     }
+    const profile: SeekerProfile = {
+      budget: Number(budget) || undefined,
+      moveInDate: moveIn || undefined,
+      householdSize: Number(household) || undefined,
+      occupation: occupation || undefined,
+    };
+    if (type === "viewing" && withProfile) {
+      const size = Number(household);
+      if (!hasProfile(profile)) next.profile = "Fill in at least one profile detail, or untick “Include my profile”.";
+      else if (household && (!Number.isInteger(size) || size < 1 || size > 20)) next.profile = "Household size should be a whole number from 1 to 20.";
+      else if (moveIn && moveIn < todayISO()) next.profile = "Choose a move-in date from today onwards.";
+    }
     if (type === "message" && !message.trim()) next.message = "Write a short message for the lister.";
     if (message.length > MAX_MESSAGE) next.message = `Keep your message under ${MAX_MESSAGE} characters.`;
     setErrors(next);
     const first = Object.keys(next)[0];
     if (first) {
-      document.getElementById(first === "when" ? "inq-date" : `inq-${first}`)?.focus();
+      document.getElementById(first === "when" ? "inq-date" : first === "profile" ? "inq-budget" : `inq-${first}`)?.focus();
       return;
     }
+    const sendProfile = type === "viewing" && withProfile;
+    if (sendProfile && currentUser && remember) saveSeekerProfile(profile);
     const id = addInquiry({
       listingId: listing.id,
       type,
@@ -62,6 +86,7 @@ export function InquiryDialog({
       message: message.trim(),
       preferredDate: type === "viewing" ? date || undefined : undefined,
       preferredTime: type === "viewing" ? time || undefined : undefined,
+      profile: sendProfile ? profile : undefined,
     });
     setSentId(id);
   }
@@ -88,7 +113,8 @@ export function InquiryDialog({
             <h2 id="inq-title" className="mt-3 section-title">{type === "viewing" ? "Viewing request sent" : "Message sent"}</h2>
             <p className="mt-1 text-sm text-ink-500">
               {type === "viewing" ? "The lister can accept it or suggest another time." : "The lister can reply in the app."}{" "}
-              {share ? "You chose to share your contact details." : "Your contact details stay private."} Demo only — nothing is sent outside IleLagos.
+              {share ? "You chose to share your contact details." : "Your contact details stay private."}
+              {type === "viewing" && withProfile ? ` Your ${listing.purpose === "sale" ? "buyer" : "renter"} profile was included.` : ""} Demo only — nothing is sent outside IleLagos.
             </p>
             <div className="mt-5 grid gap-2">
               {currentUser ? (
@@ -157,6 +183,55 @@ export function InquiryDialog({
               <p className={`mt-1 text-right text-xs ${message.length > MAX_MESSAGE ? "text-red-700" : "text-ink-500"}`}>{message.length}/{MAX_MESSAGE}</p>
               {err("message")}
             </div>
+
+            {type === "viewing" && (
+              <div className="rounded-xl border border-sand-200 p-3">
+                <label className="flex items-start gap-3 text-sm">
+                  <input type="checkbox" className="mt-0.5 h-5 w-5 shrink-0 accent-brand-600" checked={withProfile} onChange={(e) => setWithProfile(e.target.checked)} />
+                  <span>
+                    <span className="font-medium text-ink-900">Include my {listing.purpose === "sale" ? "buyer" : "renter"} profile</span>
+                    <span className="block text-xs text-ink-500">Optional. Helps the lister see if the home suits you. Just a few basics — never ID, BVN or bank details.</span>
+                  </span>
+                </label>
+                {withProfile && (
+                  <fieldset className="mt-3 space-y-3" aria-describedby={errors.profile ? "inq-profile-error" : undefined}>
+                    <legend className="sr-only">Your {listing.purpose === "sale" ? "buyer" : "renter"} profile</legend>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="inq-budget">
+                        {listing.purpose === "sale" ? "Budget (total)" : "Budget (rent per year)"}
+                      </label>
+                      <MoneyField id="inq-budget" value={budget} onChange={setBudget} placeholder={listing.purpose === "sale" ? "e.g. 90,000,000" : "e.g. 3,000,000"} aria-invalid={errors.profile ? true : undefined} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="inq-movein">{listing.purpose === "sale" ? "Move by" : "Move-in date"}</label>
+                        <input id="inq-movein" type="date" min={todayISO()} className="field" value={moveIn} onChange={(e) => setMoveIn(e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="inq-household">Household size</label>
+                        <input id="inq-household" type="number" inputMode="numeric" min={1} max={20} className="field" value={household} onChange={(e) => setHousehold(e.target.value)} placeholder="e.g. 3" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-ink-500" htmlFor="inq-occupation">Work (optional)</label>
+                      <select id="inq-occupation" className="field" value={occupation} onChange={(e) => setOccupation(e.target.value as Occupation | "")}>
+                        <option value="">Prefer not to say</option>
+                        {(Object.keys(OCCUPATION_LABEL) as Occupation[]).map((o) => (
+                          <option key={o} value={o}>{OCCUPATION_LABEL[o]}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {currentUser && (
+                      <label className="flex items-center gap-2 text-xs text-ink-700">
+                        <input type="checkbox" className="h-4 w-4 accent-brand-600" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+                        Remember this profile for my next viewing request
+                      </label>
+                    )}
+                    {err("profile")}
+                  </fieldset>
+                )}
+              </div>
+            )}
 
             <div className="rounded-xl border border-sand-200 p-3">
               <label className="flex items-start gap-3 text-sm">
